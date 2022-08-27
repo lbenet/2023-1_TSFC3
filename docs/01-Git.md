@@ -161,6 +161,14 @@ Este comando "compromete" los cambios hechos y agregados con `git add`, es decir
 
 ---
 
+```git
+git merge <rama1> <rama2>
+```
+
+Este comando permite unir dos o más ramas en una sola, es decir, incorpora el historial de las ramas en la rama "actual" (desde la que se utiliza el comando). La aplicación más importante es incluir los desarrollos en la rama `main`, aunque en general esto se hace en GitHub y es la culminación de un *pull request*. Sin embargo, a veces durante una colaboración, uno puede unir una rama, por ejemplo la rama `tarea1_ej2`, a otra rama `tarea1`, donde la segunda concentra los cambios y aportaciones importantes y que es *desde donde* se hace el *pull request*. Este comando intenta preservar las historias de ambas ramas, y sólo cuando esto se satisface es que se unen las ramas.
+
+---
+
 Los siguientes comandos son de interés a la hora de trabajar con versiones remotas del repositorio, y son importantes para los aspectos colaborativos de `git`.
 
 ```git
