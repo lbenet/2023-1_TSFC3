@@ -3,6 +3,7 @@
 <img src="https://raw.githubusercontent.com/louim/in-case-of-fire/master/in_case_of_fire.png" title="In case of fire (https://github.com/louim/in-case-of-fire)" width="280" height="200" align="center">
 
 ---
+
 # ¿Qué es `git`?
 
 `git` es un sistema de control de versiones descentralizado. `git` permite desarrollar proyectos colaborativos de manera coordinada, distribuida (descentralizada, cada quien tiene una copia íntegra), incremental y eficiente, preservando *la historia* del proyecto en cada copia del proyecto.
@@ -30,6 +31,7 @@ git config --global color.ui "auto"
 Los compandos anteriores guardan estas opciones de manera *global*, es decir, escribiendo en el archivo `~/.gitconfig`. Si por alguna razón prefieren tener una configuración *local* en relación a un proyecto concreto, las mismas instrucciones las pueden usar reemplazando `--global` por `--local`. Esto lo deben hacer desde el directorio donde reside el proyecto, y el efecto es que escribirá estas opciones en el archivo `.git/config` relativo al repositorio.
 
 ---
+
 # Flujo de trabajo
 
 De manera totalmente abstracta por ahora, el flujo de trabajo en `git` consiste en:
@@ -50,6 +52,7 @@ git checkout <nombre_de_la_rama>
 > Es **muy importante** que **siempre** trabajen desde ramas que no sean la principal.
 
 ---
+
 (1) Los "cambios" en el proyecto se hacen *cambiando* uno o varios archivos existentes, creado o borrando algunos archivos. Para registrar los cambios hechos en el archivo `<file>`, uno debe primero *añadirlos* al "índice" de git, que es una zona de almacenamiento temporal. Para esto usamos el comando:
 ```git
 git add <file>
@@ -58,6 +61,7 @@ git add <file>
 Nuevos cambios pueden ser realizados e incorporados en `<file>` a presar de que ya han sido agregados al índice, incluso si involucran a otros archivos; para que dichos nuevos cambios se registren *deben* añadirse nuevamente a la zona temporal. El "índice" es una zona de almacenamiento intermedia para, en algún sentido, ir mejorando los cambios que uno quiere hacer, permitiendo hacer pruebas o repensar si uno los quiere incluir.
 
 ---
+
 (2) Eventualmente, los cambios hechos se quieren en guardar de una manera más definitiva y explícita. Esto se hace a través del comando:
 ```git
 git commit -m "Resumen de los cambios realizados en una línea máximo"
@@ -70,6 +74,7 @@ El mensaje, que puede detallarse aún más, justamente sirve para describir los 
 > Lo importante es ir "guardando" los pasos del trabajo hecho, y avanzar hasta que "se complete" el objetivo del cambio que se propone.
 
 ---
+
 (3) Finalmente, para evitar la pérdida del trabajo uno debe respaldar el trabajo. Una alternativa gratuita es usar [GitHub](https://github.com), y existen otras como [Gitlab](https://gitlab.com) que ofrece poder configurar servidores propios en lugar de los que ofrece Gitlab. Esto se hace *empujando* los cambios hacia el servidor "remoto", usando el comando
 ```git
 git push <remote> <branch>
@@ -79,6 +84,7 @@ donde `<remote>` es el alias (abreviación) del servidor remoto, y `<branch>` es
 Todos estos pasos explican el meme incluído al principio: en caso de emergencia, 1) `git add` + `git commit`, 2) `git push`, y entonces 3) se puede abandonar el edificio.
 
 ---
+
 # Comandos básicos
 
 ```git
@@ -195,6 +201,16 @@ Permite crear una copia *local* de un repositorio remoto, que se especifica a tr
 
 ---
 
+```git
+git stash
+git stash pop
+git stash list
+```
+
+En ocasiones, al trabajar (en la rama `rama1`) debemos hacer modificaciones de otro archivo (que haremos en otra rama independiente, `rama2`) y no queremos que los cambios que estamos implementando ni se reflejen en la historia ni en la otra rama. El comando `git stash` sirve para guardar los cambios ya hechos sin necesidad de hacer un commit. En este caso, los cambios se guardan (para acceder a ellos posteriormente), se regresa al "último estado de la historia", y entonces uno puede implementar los otros cambios que se requieren. Si quieremos recuperar los cambios guardados hacemos `git stash pop`. Se pueden además tener *varios* cambios "arrumbados"; para ver cuales se tienen usamos `git stash list`.
+
+---
+
 # `git` colaborativo
 
 A fin de contribuir a un proyecto remoto del cual **no** somos los "propietarios", o simplemente no tenemos permiso de escribir, lo que es común, es típico hacer una copia (propia) del repositorio al que se quiere contribuir a partir de su propia cuenta en [GitHub](https://github.com). Esto se hace haciendo un *fork*, es decir, creando una bifurcación del proyecto original.
@@ -221,8 +237,6 @@ permite clonar un repositorio remoto a un directorio local.
 
 > Algo importante es que hay dos tipos de URL que se  pueden especificar al momento de clonar un repositorio, y esto se relaciona con la manera en que uno se identifica en [GitHub](https://github.com); usen el que más les convenga.
 
----
-
 Para ver qué configuración se tiene de los repositorios remotos, uno ejecuta
 ```git
 git remote -v
@@ -234,8 +248,6 @@ Si uno quiere agregar un nuevo servidor remoto a su máquina local, por ejemplo,
 git remote add <alias> <url_del_fork>
 ```
 donde `<url_del_fork>` es la dirección donde está nuestro fork (en [GitHub](https://github.com)), y `<alias>` es la abreviación que le daremos, por ejemplo, "fork", "mifork" o "copia_clase".
-
----
 
 La distinción entre el repositorio oficial y el fork, y por tanto sus abreviaciones (o alias), son importantes en el sentido de cuál será el utilizado como default, cuando uno omite escribir el `remote` en los comandos `git pull` o `git push`. Como convención podemos decir que `origin` será el proyecto original, y nuestro fork será `mifork`.
 Entonces, el comando
