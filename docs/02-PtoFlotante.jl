@@ -1,12 +1,17 @@
-# # Números en la computadora: números de punto flotante
+# # Números en la computadora
 
 #-
-#Preliminares
+#| echo: false
+#| output: false
+#Preliminares: activamos las paqueterías cargadas para el proyecto
 using Pkg
-Pkg.activate("..")  # Activa el directorio "." respecto al lugar donde estamos
+Pkg.activate(".")
 
 #-
-# ## Ejemplos: sutilezas al usar la aritmética de la computadora
+
+# ---
+
+# ## Sutilezas al usar la aritmética de la computadora
 
 # ### El orden de las operaciones importa
 
@@ -47,9 +52,15 @@ f1 + f2
 
 # Claramente, el orden en que realizamos las operaciones numéricas en la computadora es importante.
 
+# ---
+
 # ### Magnitudes relativas
 
-# Consideremos la función $$f(x,y) = 333.75 y^6 + x^2(11x^2y^2-y^6-121y^4-2)+5.5y^8+x/(2y)$$. La pregunta es ¿cuál es el valor (¡correcto!) de $f(x,y)$ en el punto $(77617,33096)$?
+# Consideremos la función
+# $$
+# f(x,y) = 333.75 y^6 + x^2(11x^2y^2-y^6-121y^4-2)+5.5y^8+x/(2y).
+# $$
+# La pregunta es ¿cuál es el valor (correcto, obviamente) de $f(x,y)$ en el punto $(77617,33096)$?
 
 # Para responder la pregunta definiremos primero las siguientes funciones:
 
@@ -67,7 +78,7 @@ f(77617, 33096)
 f( big(77617),  big(33096))
 
 #-
-# La pregunta es ¿cuál es el resultado correcto?
+# Entonces, ¿cuál es el resultado correcto?
 
 # Para saber cuál es el resultado correcto, evaluaremos por separado las distintas funciones involucradas.
 
@@ -88,34 +99,41 @@ f₁(77617, 33096) + f₂(77617, 33096)
 #-
 f₁(big(77617), big(33096)) + f₂(big(77617), big(33096))
 
-# La moraleja aquí es clara: adiciones y substracciones de cantidades cuyo order de magnitud rebasa los dígitos significativos utilizados, pueden llevar a resultados erróneos.
+# La moraleja de este ejemplo es clara: adiciones y substracciones de cantidades cuyo order de magnitud rebasa los dígitos significativos utilizados, pueden llevar a resultados erróneos.
+
+# ---
 
 #-
 # ### Sobre la manera de escribir las funciones
 
-# La idea es, a partir de la gráfica del polinomio $p(t)=t^6-6t^5+15t^4-20t^3+15t^2-6t+1$ cerca de 1, estimar el número de ceros del polinomio. Recordando el teorema fundamental de la aritmética, a lo mucho debemos tener 6 raíces reales (ya que el polinomio es de grado 6). Este polinomio, puede ser reescrito como $$q(t) = (t-1)^6$$, siendo ambos polinomios *exactamente* iguales.
+# La idea es, a partir de la gráfica del polinomio
+# $$p(t)=t^6-6t^5+15t^4-20t^3+15t^2-6t+1,$$
+# concentrándonos en el entorno a 1, estimar el número de ceros del polinomio. Recordando el teorema fundamental de la aritmética, a lo mucho debemos tener 6 raíces reales (ya que el polinomio es de grado 6). Este polinomio, puede ser reescrito como
+# $$q(t) = (t-1)^6,$$
+# siendo ambos polinomios *exactamente* iguales.
 
-# Para graficar usaremos la librería `Plots.jl` que permite graficar usando `Gnuplot`. Graficaremos $p(t)$ en el intervalo $[0.9951171875, 1.0048828125]$ usando pasos de $1/2^{16}$; la idea de usar estos números es que son exactamente representables en la computadora. Usaremos el siguiente código
+# Para graficar usaremos la librería `Plots.jl` que es relativamente flexible (en cuanto a los graficadores internos que usa), aunque lenta para descargar y correr. Graficaremos $p(t)$ en el intervalo $[0.9951171875, 1.0048828125]$ usando pasos de $1/2^{16}$; la idea de usar estos números es que son exactamente representables en la computadora.
+
+# Usaremos el siguiente código
 
 #
-Pkg.add("Plots") # Esto agrega la paquetería Plots.jl
+#La siguiente instrucción instala la paquetería Plots.jl
+#Pkg.add("Plots")
 
-#-
 using Plots
 
-#-
 p(t) = t^6 - 6t^5 + 15t^4 - 20t^3 + 15t^2 - 6t + 1
 q(t) = (t-1)^6
 
-#-
-x = 1-5/2^10 : 1/2^16 : 1+5/2^10
+xr = 1-5/2^10 : 1/2^16 : 1+5/2^10
 
-#-
-plot( x, p.(x), color=:blue, label="p(t)")
-plot!(x, q.(x), color=:red, lw=2, label="q(t)")
+plot( xr, p.(xr), color=:blue, label="y = p(t)", xlabel="t", ylabel="y")
+plot!(xr, q.(xr), color=:red, lw=2, label="y = q(t)")
 
 
 # El resultado de este ejemplo es que la manera en que uno escribe una función es importante numéricamente; si bien $p(t)=q(t)$ matemáticamente, su implementación numérica no lo muestra.
+
+# ---
 
 #-
 # ## Números en la computadora
@@ -210,8 +228,9 @@ plot!(x, q.(x), color=:red, lw=2, label="q(t)")
 
 #-
 #Generamos todos los números normales dados e_-, e_+, prec, para $\beta=2$
+#El símbolo 𝔽 se obtiene `\bbF`+`<TAB>`
 𝔽 = Float64[0.0]
-b₀ = 1.0
+b₀ = 1
 for ε = -1:2
 	for b₁=0:1
 		for b₂=0:1
@@ -226,15 +245,14 @@ sort!(𝔽)
 # Una representación gráfica de este conjunto se observa en la siguiente gráfica.
 
 #-
-#Usamos Gaston.jl (que es muy parecido a gnuplot) para representar este conjunto
 xmax = maximum(𝔽)
-plot(size=(600,100))
+#Representación gráfica de 𝔽
+plot(size=(600,250), grid=:false, framestyle=:zerolines)
 plot!( 𝔽, zero.(𝔽), yerr=0.5, markerstrokecolor=:auto, lw=2,
     xlims=(-xmax-0.5, xmax+0.5), ylims=(-1,1),
-    xticks=collect(-xmax:xmax), yticks=:none,
-    label=:none)
-plot!( [-xmax-0.5, xmax+0.5], zeros(2), color=:black, lw=2,
-    label=:none)
+    xticks=-xmax:xmax, yticks=:none, xlabel="x", ylabel="",
+    legend=:false)
+plot!( [-xmax-0.5, xmax+0.5], zeros(2), color=:black, lw=2)
 
 #-
 # Como se puede observar de la gráfica, la distancia entre puntos vecinos de $\mathbb{F}_{2,3}^{-1,2}$ es constante por segmentos. Estos segmentos están separados por potencias consecutivas de $\beta$ obtenidas al variar $\varepsilon$, y la distancia entre números consecutivos disminuye a medida que el exponente $\varepsilon$ disminuye, excepto alrededor del $0$.
@@ -246,7 +264,7 @@ plot!( [-xmax-0.5, xmax+0.5], zeros(2), color=:black, lw=2,
 #Generamos todos los números subnormales para beta=2 y se los añadimos a los normales
 s𝔽 = Float64[]
 ε = -1
-b₀ = 0.0
+b₀ = 0
 for b₁=0:1
 	for b₂=0:1
         b₁ == b₂ == 0 && continue # no repetimos al 0
@@ -258,14 +276,13 @@ sort!(s𝔽)
 
 #-
 #Representación gráfica de s𝔽
-plot(size=(600,100))
+plot(size=(600,250), grid=:false, framestyle=:zerolines)
 plot!( 𝔽, zero.(𝔽), yerr=0.5, markerstrokecolor=:auto, lw=2,
     xlims=(-xmax-0.5, xmax+0.5), ylims=(-1,1),
-    xticks=collect(-xmax:xmax), yticks=:none,
-    label=:none)
+    xticks=-xmax:xmax, yticks=:none, xlabel="x", ylabel="",
+    legend=:false)
 plot!( s𝔽, zero.(s𝔽), yerr=0.5, markerstrokecolor=:auto, label=:none)
-plot!( [-xmax-0.5, xmax+0.5], zeros(2), color=:black, lw=2,
-    label=:none)
+plot!( [-xmax-0.5, xmax+0.5], zeros(2), color=:black, lw=2)
 
 
 #-
@@ -276,11 +293,13 @@ plot!( [-xmax-0.5, xmax+0.5], zeros(2), color=:black, lw=2,
 #-
 # Sólo nos falta entonces establecer la manera de mapear $\mathbb{R}$ a $\mathbb{F}$."
 
+# ---
+
 #-
 # ## Redondeo
 
 #-
-# El mapeo que se encarga de pasar de $\mathbb{R}$ a $\mathbb{F}$ es el *redondeo*. Obviamente, este mapeo no puede ser invertible.
+# El mapeo que se encarga de pasar de $\mathbb{R}$ a $\mathbb{F}$ es el *redondeo*. Obviamente, este mapeo no es invertible.
 
 #-
 # Antes de definir el mapeo, o de hecho *los mapeos* ya que no es único, es útil extender el dominio y el rango de los conjuntos en $\mathbb{R}^*=\mathbb{R}\cup\{-\infty,\infty\}$ y de la misma manera $\mathbb{F}^*=\mathbb{F}\cup\{-\infty,\infty\}$. Esta extensión permite representar los números que son más grandes que el mayor de los números de punto flotante, $x_\textrm{max}$.
@@ -299,11 +318,9 @@ plot!( [-xmax-0.5, xmax+0.5], zeros(2), color=:black, lw=2,
 #-
 # La manera más sencilla de redondear es el modo conocido como redondeo a cero. Este modo es equivalente al truncamiento, es decir, a omitir todos los "dígitos" de la mantisa que están más allá de la precisión. De esta manera definimos
 #
-# ```math
-# \begin{equation*}
+# $$
 # \square_z(x) = \textrm{sign}(x) \max\left(y\in\mathbb{F}^*: y\le |x|\right).
-# \end{equation*}
-# ```
+# $$
 #
 # En este caso, si escribimos $x=(-1)^\sigma(b_0.b_1b_2\dots)_\beta\,\beta^e$, entonces el redondeo a cero corresponde a $\square_z(x) = (-1)^\sigma(b_0.b_1b_2\dots b_{p-1})_\beta\,\beta^e$.
 #
@@ -372,3 +389,9 @@ plot!( [-xmax-0.5, xmax+0.5], zeros(2), color=:black, lw=2,
 
 #-
 # De manera similar uno puede definir el redondeo al punto flotante *impar* más cercano.
+
+# #-
+# ## Bibliografía y lecturas recomendadas
+#
+# - D. Goldberg, "What Every Computer Scientist Should Know About Floating-Point Arithmetic". ACM Computing Surveys. 23 (1): 5–48. [versión revisada (pdf)](https://www.validlab.com/goldberg/paper.pdf)
+# - W. Tucker, Validated Numerics: A Short Introduction to Rigorous Computations, Princeton University Press, 2001.
