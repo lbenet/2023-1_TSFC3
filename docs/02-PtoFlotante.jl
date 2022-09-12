@@ -52,8 +52,6 @@ f1 + f2
 
 # Claramente, el orden en que realizamos las operaciones numéricas en la computadora es importante.
 
-# ---
-
 # ### Magnitudes relativas
 
 # Consideremos la función
@@ -100,8 +98,6 @@ f₁(77617, 33096) + f₂(77617, 33096)
 f₁(big(77617), big(33096)) + f₂(big(77617), big(33096))
 
 # La moraleja de este ejemplo es clara: adiciones y substracciones de cantidades cuyo order de magnitud rebasa los dígitos significativos utilizados, pueden llevar a resultados erróneos.
-
-# ---
 
 #-
 # ### Sobre la manera de escribir las funciones
@@ -367,12 +363,13 @@ plot!( [-xmax-0.5, xmax+0.5], zeros(2), color=:black, lw=2)
 # \bigtriangledown(x) \le x \le \bigtriangleup(x).
 # $$
 #
-# La idea entonces del redondeo al punto flotante más cercano es la siguiente: Para todo punto $|x| \le x_\textrm{max}$, definimos el punto medio del intervalo de puntos de $\mathbb{F}^*$ que los acota como $\mu=(\bigtriangledown(x) + \bigtriangleup(x))/2$; si $|x| > x_\textrm{max}$ entonces definimos $\mu=\textrm{sign}(x) |x_\textrm{max}|$. Entonces, el redondeo al punto flotante más cercano regresa $\bigtriangledown(x)$ si $x < \mu$ y $\bigtriangleup(x)$ si $x > \mu$. En el caso en que $x=\mu$, las distintas maneras de resolver el empate definen los distintos modos del redondeo al punto más cercano.
+# La idea entonces del redondeo al punto flotante más cercano es la siguiente: Para todo punto $|x| \le x_\textrm{max}$, definimos el punto medio del intervalo de puntos de $\mathbb{F}^*$ que los acota como $\mu=(\bigtriangledown(x) + \bigtriangleup(x))/2$; si $|x| > x_\textrm{max}$ entonces definimos $\mu=\textrm{sign}(x) |x_\textrm{max}|$. Entonces, el redondeo al punto flotante más cercano corresponde a $\bigtriangledown(x)$ si $x < \mu$, o a $\bigtriangleup(x)$ si $x > \mu$. En el caso en que $x=\mu$, las distintas maneras de resolver el empate definen los distintos modos del redondeo al punto más cercano.
 
 #-
-# Una manera para no tener *sesgo* en el error, es decir, que el error esté centrado alrededor de cero es usando lo que se llama el *redondeo al par más cercano*, y que denotaremos como $\square$. Esta manera de redondear es la que se encuentra de manera más común.
+# Una manera para no tener *sesgo* en el error, es decir, que el error esté centrado alrededor de cero en promedio, es usando lo que se llama el *redondeo al par más cercano*, y que denotaremos como $\square$. Esta manera de redondear es la que está implementada comúnmente.
 #
-# Escribimos la mantisa de los números de punto flotante que acotan $x$ como $(a_0.a_1a_2\dots a_{p-1})_\beta$ y $(b_0.b_1b_2\dots b_{p-1})_\beta$. Entonces, si $x\notin \mathbb{F}^*$, definimos este modo como
+#-
+# A fin de caracterizar este modo de redondeo, escribimos la mantisa de los números de punto flotante que acotan $x$ como $(a_0.a_1a_2\dots a_{p-1})_\beta$ y $(b_0.b_1b_2\dots b_{p-1})_\beta$. Entonces, si $x\notin \mathbb{F}^*$, definimos este modo como
 #
 # $$
 # \begin{align*}
@@ -385,12 +382,194 @@ plot!( [-xmax-0.5, xmax+0.5], zeros(2), color=:black, lw=2)
 # \end{align*}
 # $$
 #
+#-
 # Un punto importante que vale la pena recalcar es que si $|x|>x_\textrm{max}$, el redondeo al punto flotante par más cercano da como resultado $\square(x) = \text{sign}(x)\infty$, que no necesariamente es el punto flotante más cercano.
 
 #-
 # De manera similar uno puede definir el redondeo al punto flotante *impar* más cercano.
 
-# #-
+#-
+# ### Errores producidos por el redondeo
+
+#-
+# Existen resultados importantes sobre el error que se produce al redondear; el siguiente teorema da cotas del error absoluto y relativo que se produce al redondear.
+
+#-
+# **Teorema:** Si $x$ es un número real en el rango normalizado de $\mathbb{F}_{\beta,p}$, el error relativo producido por el redondeo es $| (x-\bigcirc(x))/x | < \varepsilon_M,$ y el absoluto es $| x-\bigcirc(x) | < \varepsilon_M |x|$, donde $\varepsilon_M=\beta^{-(p-1)}$ es el epsilón de la máquina.
+
+#-
+# Cuando el redondeo es dirigido, las cotas se pueden reducir con un factor 0.5. El epsilón de la máquina, $\varepsilon_M$, es el número más pequeño que sumado a 1 da un valor distinto a 1, es decir, la distancia de 1 al *siguiente* número de punto flotante.
+
+#-
+# Un punto importante del teorema anterior es el hecho de que las cotas dadas se aplican sólo a números de punto flotante normalizados. Un resultado análogo se puede establecer para números reales dentro del rango de números de punto flotante subnormales, con el resultado de que los errores relativos son más grandes.
+
+#-
+# ---
+
+# ## Aritmética de punto flotante
+
+#-
+# La mayor incomodidad al calcular con números en $\mathbb{F}$, desde el punto de vista matemático, es que la aritmética de números de punto flotante no es cerrada. Esto significa que, al hacer las operaciones aritméticas considerando dos números $x$ y $y$, el resultado (exacto) puede no estar en $\mathbb{F}$. Este problema aparece por considerar precisión finita. Entonces, la única manera de definir la aritmética es usando un redondeo sobre el valor real (exacto, con precisión infinita) a la operación entre $x$ y $y$.
+#
+#-
+# Se dice que la aritmética de punto flotantes es de *máxima calidad* si, dados dos valores $x, y \in \mathbb{F}$, entonces
+# $$x\circledast y = \bigcirc(x \ast y).$$
+# Aquí, $\ast$ representa la operación aritmética *exacta* (con precisión infinita), y $\circledast$ es la operación análoga hecha con precisión finita. Entonces, la propiedad anterior establece que el resultado hecho con precisión finita coincide con el resultado usando precisión infinita después de ser redondeado.
+#
+#-
+# Así, si la aritmética de punto flotante es de máxima calidad, el error al calcular el resultado (aritmético) $x\circledast y$ corresponde al error de redondeo. De aquí se tiene que, si $x$ y $y$ son números de punto flotante normales, el error relativo del cálculo $x\circledast y$, comparado con $x \ast y$, está acotado por $\varepsilon_M$, como consecuencia del teorema enunciado anteriormente. Es importante enfatizar que los comentarios hechos respecto al error de $x\circledast y$ involucran números de punto flotante normales y solamente una operación aritmética. Cálculos con más de una operación aritmética pueden tener errores relativos mayores al epsilón de la máquina.
+
+#-
+# ---
+
+# ## IEEE-754
+
+#-
+# Para la aritmética de punto flotante existe un estándar, cuyo objetivo es definir un *formato* común para números de punto flotante, y algunas propiedades que dicho formato debe cumplir en su implementación, independientemente de los detalles concretos (como el lenguaje) de dicha implementación.
+#
+#-
+# El estándar IEEE-754 establece un formato binario, entonces $\beta=2$. Hay varias razones por las que $\beta=2$ es importante: la arquitectura de las computadoras es una; otra, es que muchos teoremas sobre el error relacionado con operaciones de punto flotante son proporcionales a $\beta$, por lo que $\beta=2$ minimiza dichos errores. Aún así, se han usado otros formatos no binarios. Otra razón más sutil, es que con $\beta=2$ se puede *ganar* un bit extra de precisión para los números normales, ya que el primer bit $b_0$ de la mantisa se puede omitir. En efecto, si son números normales el primer bit de la mantisa es 1, y sólo si son subnormales el primer bit es 0.
+#
+#-
+# El estándar define cuatro modos de precisión (sencilla, doble, sencilla extendida y doble extendida), pero aquí nos enfocaremos en la precisión sencilla y sobretodo en la doble. El estándar requiere $p=24$ para la mantisa en precisión sencilla, y 8 bits para el exponente (resultando en 32 bits, incluyendo el bit del signo y el bit omitido de la mantisa); para doble precisión tenemos $p=53$ para la mantisa y 11 bits para el exponente. El estándar especifica además el arreglo de los bits: el primer bit es el del signo,después vienen los bits del exponente y, finalmente, los bits de la mantisa, donde se omite el bit $b_0$.
+#
+#-
+# El exponente, en precisión sencilla, se define de tal manera que se cubra el rango de exponentes desde $e_\min=-126$ hasta $e_\max=127$; para precisión doble se tiene $e_\min=-1022$ y $e_\max=1023$. Como estos exponentes pueden ser positivos o negativos, se necesita una forma para representar el signo. El estándar utiliza lo que se llama una representación sesgada (*bias representation*), y el exponente del número de punto flotante se determina sumando el sesgo. Para precisión sencilla el sesgo es 127, y para la doble es 1023. Lo que esto significa es que si $\tilde{e}$ es el valor representado por los bits del exponente, el valor del exponente que de facto se considera es $e = \tilde{e}-127$ para precisión sencilla, o $e=\tilde{e}-1023$ para precisión doble. Al exponente $e$ se le llama exponente sin sesgo.
+#
+#-
+# Usando esta convención para el exponente, el exponente $e_\min-1$ se usa para representar al 0, y también los números subnormales, y $e_\max+1$ par definir cantidades especiales (`Inf`, con mantisa 0, y `NaN` en cualquier otro caso.
+#
+#-
+# El estándar también requiere que las operaciones aritméticas (suma, resta, multiplicación y división) sean hechas usando el *redondeo exacto*. El estándar también establece que la raíz cuadrada, el residuo y la conversión de enteros a punto flotante sean correctamente redondeadas.
+
+#_
+# ---
+
+#-
+# ## Un resultado riguroso con la computadora
+#
+#-
+# Ahora ilustraremos un ejemplo en donde obtendremos un resultado correcto y riguroso, a 12 posiciones decimales correctas, de $S = \sum_{k=1}^\infty k^{-2}$. La respuesta exacta de esta suma, como bien sabemos, es $\pi^2/6$.
+#
+#-
+# Obviamente, no podemos hacer la suma con un número infinito de términos; la estrategia entonces será hacer la suma finita hasta $N$, y acotar (con matemáticas) el resto de la suma:
+# $$
+# S = S_N+\tilde{S}_N = \sum_{k=1}^N\frac{1}{k^2} + \sum_{k=N+1}^\infty\frac{1}{k^2}.
+# $$
+
+#-
+# Empezamos primero por acotar la suma $\tilde{S}_N$. Para esto usaremos
+# $$
+# \int_{N+1}^\infty \frac{1}{x^2}\text{d}x < \tilde{S}_N < \int_{N+1}^\infty \frac{1}{(x-1)^2}\text{d}x .
+# $$
+
+xs = 1.0:1/1024:5.0
+#
+g(x) = 1 / x^2
+#
+plot(2.0:1/1024:5.0, x -> g.(x .- 1), xlabel = "x", ylabel="g(x)",
+  color=:red, yscale=:log10, label="g(x)=1/(x-1)^2")
+plot!(2:5, x -> g.(x), color=:blue, markershape=:circle)
+plot!(2.0:1/1024:5.0, x -> g.(x), color=:red, label="g(x)=1/x^2")
+
+#-
+# De aquí, integrando explícitamente, obtenemos
+# $$
+# \frac{1}{N+1} < \tilde{S}_N < \frac{1}{N}.
+# $$
+# La *anchura* de esta cota es $\delta_N=\frac{1}{N(N+1)}$. Entonces, tomando $N=2\times 10^6$ tenemos $\delta_N<2.5\times 10^{-13}$, que es suficiente para obtener 12 dígitis correctos.
+#
+#-
+# Ahora evaluamos *numéricamente* $S_N$.
+#
+#-
+# > **NOTA**: En lo que sigue, usaremos `BigFloat`, ya que por el momento Julia sólo permite *cambiar* el modo de redondeo para los `BigFloat`. Además, cambiaremos la precisión a 53 bits, que es lo que equivale al caso de `Float64`.
+
+#Fijamos la precisión en 53 bits (equivale a Float64)
+begin
+	oldprecision = precision(BigFloat)
+	setprecision(BigFloat, 53)
+end
+#
+kmax = 2_000_000
+δN = 1/(kmax * (kmax+1))
+
+#-
+#Calculamos, con el modo de redondeo hacia arriba, S_N
+sn_up = big(0.0)
+oldrounding = rounding(BigFloat)
+setrounding(BigFloat, RoundUp)
+for k = 1:kmax
+	sn_up += big(1) / k^2
+end
+setrounding(BigFloat, oldrounding)
+sn_up
+
+#-
+#Calculamos, con el modo de redondeo hacia arriba, S_N
+sn_down = big(0.0)
+oldrounding = rounding(BigFloat)
+setrounding(BigFloat, RoundDown)
+for k = 1:kmax
+	sn_down += big(1) / k^2
+end
+setrounding(BigFloat, oldrounding)
+sn_down
+
+#-
+# La diferencia entre estos resultados, incluyendo la anchura de la cota, es:
+sn_up - sn_down + δN
+
+#-
+# El resultado anterior **no** da la precisión que buscábamos ($10^{-12}$). Esto se debe a que los primeros sumandos son más grandes que los últimos, y al hacer así la suma hay una pérdida de precisión.
+#
+#-
+# Usando las cotas inferior y la superior de $\tilde{S}_N$, las cotas del resultado para $S_N$ que obtenemos son:
+sn_down + big(1)/(kmax+1), sn_up + big(1)/kmax
+
+#-
+# Usando la observación anterior de que los primeros sumandos son los más grandes, hacemos el mismo cálculo, esta vez haciendo la suma iterando $k$ al revés para sumar primero los valores más pequeños.
+
+sn_up2 = big(0.0)
+oldrounding = rounding(BigFloat)
+setrounding(BigFloat, RoundUp)
+for k = kmax:-1:1
+	sn_up2 += big(1)/k^2
+end
+setrounding(BigFloat, oldrounding)
+sn_up2
+
+#-
+sn_down2 = big(0.0)
+oldrounding = rounding(BigFloat)
+setrounding(BigFloat, RoundDown)
+for k = kmax:-1:1
+	sn_down2 += big(1)/k^2
+end
+setrounding(BigFloat, oldrounding)
+sn_down2
+
+#-
+# La diferencia de los resultados obtenidos, incluyendo la anchura de la cota, en este caso es
+sn_up2 - sn_down2 + δN
+
+#-
+# Usando las cotas inferior y la superior de $\tilde{S}_N$ obtenemos:
+
+sn_down2 + big(1)/(kmax+1), sn_up2 + big(1)/kmax
+
+#-
+# El resultado numérico a partir de $\pi^2/6$, tanto en `Float64` como en `BigFloat` (con la precisión usal de los `BigFloat`) está entre ambos de los valores obtenidos para las cotas.
+
+setprecision(oldprecision)
+#
+pi^2/6 # Float64 !!
+
+#-
+big(pi)^2/6
+
+# ---
+
 # ## Bibliografía y lecturas recomendadas
 #
 # - D. Goldberg, "What Every Computer Scientist Should Know About Floating-Point Arithmetic". ACM Computing Surveys. 23 (1): 5–48. [versión revisada (pdf)](https://www.validlab.com/goldberg/paper.pdf)
