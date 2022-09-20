@@ -434,10 +434,10 @@ plot!( [-xmax-0.5, xmax+0.5], zeros(2), color=:black, lw=2)
 # El estándar define cuatro modos de precisión (sencilla, doble, sencilla extendida y doble extendida), pero aquí nos enfocaremos en la precisión sencilla y sobretodo en la doble. El estándar requiere $p=24$ para la mantisa en precisión sencilla, y 8 bits para el exponente (resultando en 32 bits, incluyendo el bit del signo y el bit omitido de la mantisa); para doble precisión tenemos $p=53$ para la mantisa y 11 bits para el exponente. El estándar especifica además el arreglo de los bits: el primer bit es el del signo,después vienen los bits del exponente y, finalmente, los bits de la mantisa, donde se omite el bit $b_0$.
 #
 #-
-# El exponente, en precisión sencilla, se define de tal manera que se cubra el rango de exponentes desde $e_\min=-126$ hasta $e_\max=127$; para precisión doble se tiene $e_\min=-1022$ y $e_\max=1023$. Como estos exponentes pueden ser positivos o negativos, se necesita una forma para representar el signo. El estándar utiliza lo que se llama una representación sesgada (*bias representation*), y el exponente del número de punto flotante se determina sumando el sesgo. Para precisión sencilla el sesgo es 127, y para la doble es 1023. Lo que esto significa es que si $\tilde{e}$ es el valor representado por los bits del exponente, el valor del exponente que de facto se considera es $e = \tilde{e}-127$ para precisión sencilla, o $e=\tilde{e}-1023$ para precisión doble. Al exponente $e$ se le llama exponente sin sesgo.
+# El exponente, en precisión sencilla, se define de tal manera que se cubra el rango de exponentes desde $e_\textrm{min}=-126$ hasta $e_\textrm{max}=127$; para precisión doble se tiene $e_\textrm{min}=-1022$ y $e_\textrm{max}=1023$. Como estos exponentes pueden ser positivos o negativos, se necesita una forma para representar el signo. El estándar utiliza lo que se llama una representación sesgada (*bias representation*), y el exponente del número de punto flotante se determina sumando el sesgo. Para precisión sencilla el sesgo es 127, y para la doble es 1023. Lo que esto significa es que si $\tilde{e}$ es el valor representado por los bits del exponente, el valor del exponente que de facto se considera es $e = \tilde{e}-127$ para precisión sencilla, o $e=\tilde{e}-1023$ para precisión doble. Al exponente $e$ se le llama exponente sin sesgo.
 #
 #-
-# Usando esta convención para el exponente, el exponente $e_\min-1$ se usa para representar al 0, y también los números subnormales, y $e_\max+1$ par definir cantidades especiales: `Inf`, con mantisa 0, y `NaN` en cualquier otro caso.
+# Usando esta convención para el exponente, el exponente $e_\textrm{min}-1$ se usa para representar al 0, y también los números subnormales, y $e_\textrm{max}+1$ par definir cantidades especiales: `Inf`, con mantisa 0, y `NaN` en cualquier otro caso.
 #
 #-
 # El estándar también requiere que las operaciones aritméticas (suma, resta, multiplicación y división) sean hechas usando el *redondeo exacto*. El estándar también establece que la raíz cuadrada, el residuo y la conversión de enteros a punto flotante sean correctamente redondeadas.
@@ -504,7 +504,7 @@ setrounding(BigFloat, oldrounding)
 sn_up
 
 #-
-#Calculamos, con el modo de redondeo hacia arriba, S_N
+#Calculamos, con el modo de redondeo hacia abajo, S_N
 sn_down = big(0.0)
 oldrounding = rounding(BigFloat)
 setrounding(BigFloat, RoundDown)
