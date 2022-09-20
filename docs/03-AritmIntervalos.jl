@@ -23,6 +23,7 @@
 # [a] = [\underline{a}, \overline{a}] = \left\{ x\in \mathbb{R} :
 # \underline{a} \le x \le \overline{a} \right\}.
 # $$
+# Llamaremos a $\underline{a}$ el *ínfimo* del intervalo $[a]$, y a $\overline{a}$ el supremo.
 
 #-
 # El conjunto de estos intervalos lo denotaremos
@@ -73,7 +74,7 @@
 #-
 # También podemos extender las nociones de unión e intersección de conjuntos, $\cup$ y $\cap$, a $\mathbb{IR}$, aunque se requiere proceder con cuidado. Por ejemplo, la unión de dos intervalos puede *no* definir un intervalo, por ejemplo, cuando los dos intervalos están suficientemente separados, es decir, son disjuntos. Es por esto que se usará el concepto de *hull* (cáscara), y que se define como el menor intervalo que incluye a todos los elementos de ambos intervalos
 # $$
-# [a] \sqcup [b] = [\min(\underline{a},\underline{b}), \max(\overline{a}, \overline{b})].
+# [a] \sqcup [b] = [\textrm{min}(\underline{a},\underline{b}), \textrm{max}(\overline{a}, \overline{b})].
 # $$
 # Es claro que el intervalo que se obtiene *incluye* o *contiene* a la unión de los conjuntos representados por los intervalos.
 
@@ -83,7 +84,7 @@
 # [a] \cap [b] =
 # \begin{cases}
 # [\varnothing], & \overline{b}<\underline{a} \textrm{ o } \overline{a}<\underline{b}, \\
-# [\max(\underline{a},\underline{b}), \min(\overline{a},\overline{b})], & \textrm{ en otros casos.}
+# [\textrm{max}(\underline{a},\underline{b}), \textrm{min}(\overline{a},\overline{b})], & \textrm{ en otros casos.}
 # \end{cases}
 # $$
 
@@ -93,8 +94,8 @@
 # \begin{align*}
 # \textrm{rad}(a) & = \frac{1}{2}(\overline{a}-\underline{a}), \;\textrm{radio de }a,\\
 # \textrm{mid}(a) & = \frac{1}{2}(\underline{a}+\overline{a}), \;\textrm{punto medio de }a,\\
-# \textrm{mag}([a]) & = \max\left\{ |x|: x\in [a]\right\}, \;\textrm{magnitud de }a,\\
-# \textrm{mig}([a]) & = \min\left\{ |x|: x\in [a]\right\}, \;\textrm{mignitud de }a.\\
+# \textrm{mag}([a]) & = \textrm{max}\left\{ |x|: x\in [a]\right\}, \;\textrm{magnitud de }a,\\
+# \textrm{mig}([a]) & = \textrm{min}\left\{ |x|: x\in [a]\right\}, \;\textrm{mignitud de }a.\\
 # \end{align*}
 # $$
 
@@ -125,7 +126,7 @@
 #-
 # Claramente, podemos hacer de $\mathbb{IR}$ un espacio métrico, al definir la distancia de Hausdorff entre dos intervalos como
 # $$
-# d([a],[b]) = \max(|\underline{a}-\underline{b}|, |\overline{a}-\overline{b}|)
+# d([a],[b]) = \textrm{max}(|\underline{a}-\underline{b}|, |\overline{a}-\overline{b}|)
 # $$
 # De esta definición tenemos que $d([a],[b])=0$ si y sólo si $[a]=[b]$.
 
@@ -162,8 +163,8 @@
 # [a] + [b] & = [ \underline{a}+\underline{b}, \overline{a}+\overline{b} ],\\
 # [a] - [b] & = [ \underline{a}-\overline{b}, \overline{a}-\underline{b} ],\\
 # [a] \times [b] & = [
-# \min(\underline{a}\underline{b}, \overline{a}\underline{b}, \underline{a}\overline{b}, \overline{a}\overline{b}),
-# \max(\underline{a}\underline{b}, \overline{a}\underline{b}, \underline{a}\overline{b}, \overline{a}\overline{b}) ],\\
+# \textrm{min}(\underline{a}\underline{b}, \overline{a}\underline{b}, \underline{a}\overline{b}, \overline{a}\overline{b}),
+# \textrm{max}(\underline{a}\underline{b}, \overline{a}\underline{b}, \underline{a}\overline{b}, \overline{a}\overline{b}) ],\\
 # [a] \div [b] & = [a] \times [1/\overline{b}, 1/\underline{b}], \quad\textrm{si }0\notin [b].\\
 # \end{align*}
 # $$
@@ -173,6 +174,9 @@
 
 #-
 # Una consecuencia de las definiciones anteriores es que se cumplen las propiedades conmutativa y asociativa para la adición y la multiplicación de intervalos. Además, es fácil convencerse que $[0,0]$ y $[1,1]$ son los únicos elementos neutros respecto a la adición y multiplicación de intervalos, respectivamente. Sin embargo, *en general* **no existe** el intervalo inverso bajo la suma o el producto. Por ejemplo, si usamos las definiones de arriba, obtenemos que $[1,3]-[1,3] = [-2,2]\neq [0,0]$, y $[1,3]\div[1,3] = [1/3,3]\neq [1,1]$. Si bien ninguno de los resultados corresponde al intervalo neutro aditivo o multiplicativo, ambos resultados contienen al neutro respectivo.
+
+#-
+# Vale la pena también notar que las operaciones aritméticas *pueden* involucrar al intervalo $[\varnothing]$, en cuyo caso el resultado es el mismo intervalo.
 
 #-
 # Otra consecuencia importante en la práctica, en particular en la forma en que se hacen los cálculos, es que la propiedad distributiva *no siempre* se cumple, pero lo que sí se cumple es la *propiedad subdistributiva*:
@@ -303,20 +307,20 @@ bitstring(an)
 # [a] - [b] & = \big[\bigtriangledown(\underline{a}-\overline{b}),
 # \bigtriangleup(\overline{a}-\underline{b})\big], \\
 # [a] \times [b] & = \big[
-#     \min\big\{ \bigtriangledown(\underline{a}\underline{b}),
+#     \textrm{min}\big\{ \bigtriangledown(\underline{a}\underline{b}),
 #     \bigtriangledown(\underline{a}\overline{b}),
 #     \bigtriangledown(\overline{a}\underline{b}),
 #     \bigtriangledown(\overline{a}\overline{b})\big\},\\
-#     & \qquad\max\big\{ \bigtriangleup(\underline{a}\underline{b}),
+#     & \qquad\textrm{max}\big\{ \bigtriangleup(\underline{a}\underline{b}),
 #     \bigtriangleup(\underline{a}\overline{b}),
 #     \bigtriangleup(\overline{a}\underline{b}),
 #     \bigtriangleup(\overline{a}\overline{b})\big\}\big], \\
 # [a] \div [b] & = \big[
-#     \min\big\{ \bigtriangledown(\underline{a}/\underline{b}),
+#     \textrm{min}\big\{ \bigtriangledown(\underline{a}/\underline{b}),
 #     \bigtriangledown(\underline{a}/\overline{b}),
 #     \bigtriangledown(\overline{a}/\underline{b}),
 #     \bigtriangledown(\overline{a}/\overline{b})\big\},\\
-#     & \qquad\max\big\{ \bigtriangleup(\underline{a}/\underline{b}),
+#     & \qquad\textrm{max}\big\{ \bigtriangleup(\underline{a}/\underline{b}),
 #     \bigtriangleup(\underline{a}/\overline{b}),
 #     \bigtriangleup(\overline{a}/\underline{b}),
 #     \bigtriangleup(\overline{a}/\overline{b})\big\}\big], \ (0\notin [b]),
