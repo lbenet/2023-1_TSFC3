@@ -6,15 +6,15 @@ using Intervalos
 
 @testset "Tarea1" begin
 
-    const u = Intervalo(1.0)
-    const z = Intervalo(0.0)
-    const a = Intervalo(1.5, 2.5)
-    const b = Intervalo(1, 3)
-    const c = Intervalo(BigFloat("0.1"), big(0.1))
-    const d = Intervalo(-1, 1)
-    const f = Intervalo(prevfloat(Inf))
-    const emptyFl = intervalo_vacio(Float64)
-    const emptyB = intervalo_vacio(BigFloat)
+    u = Intervalo(1.0)
+    z = Intervalo(0.0)
+    a = Intervalo(1.5, 2.5)
+    b = Intervalo(1, 3)
+    c = Intervalo(BigFloat("0.1"), big(0.1))
+    d = Intervalo(-1, 1)
+    f = Intervalo(prevfloat(Inf))
+    emptyFl = intervalo_vacio(Float64)
+    emptyB = intervalo_vacio(BigFloat)
 
     @testset "Creación de intervalos" begin
         @test typeof(a) == Intervalo{Float64}
