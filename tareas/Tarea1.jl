@@ -15,7 +15,7 @@
 
 #-
 # El módulo `Intervalos` está definido en `Intervalos/src/Intervalos.jl`. Ese archivo cargará
-# el archivo `intervalos.jl` que se deberá encuentar en el directorio `Intervalos/src/nombre_equipo/`,
+# el archivo `intervalos.jl` que se deberá encontar en el directorio `Intervalos/src/nombre_equipo/`,
 # y que es donde estará el código que se les pide para la tarea.
 #
 # En esta tarea **no** hemos especificado qué funciones o estructuras debe *exportar* su módulo,
