@@ -79,7 +79,7 @@
 # Es claro que el intervalo que se obtiene *incluye* o *contiene* a la unión de los conjuntos representados por los intervalos.
 
 #-
-# Para extender la intersección entre dos intervalos es necesario agregar al conjunto vacío a $\mathbb{IR}$, cuya extensión denotaremos $[\varnothing]$,obviamente para poder considerar el caso en que los intervalos sean disjuntos. Con esto, definimos a la intersección como
+# Para extender la intersección entre dos intervalos es necesario agregar al conjunto vacío a $\mathbb{IR}$, cuya extensión denotaremos $[\varnothing]$, obviamente para poder considerar el caso en que los intervalos sean disjuntos. Con esto, definimos a la intersección como
 # $$
 # [a] \cap [b] =
 # \begin{cases}
@@ -218,7 +218,7 @@
 # Claramente, para poder tener a cero en el denominador en una división, requerimos la noción de infinito en $\mathbb{R}$.
 
 #-
-# En la *extensión proyectiva*, uno considera la compactificación de $\mathbb{R}$ en el círculo (de radio 1, centrado en (0,1/2)), al considerar la intersección sobre el círculo de la recta que une al punto $x\in\mathbb{R}$ con el polo norte del círculo. Esto introduce un nuevo punto, cuya proyección es el polo norte, que identificamos con el infinito (¡sin signo!). Esta extensión, $\mathbb{R}^*$,  permite que podamos escribir $[c]$ en el ejemplo de arriba como un *intervalo extendido*, $[1, -1]$, donde este intervalo se entiende como los puntos en que $x\ge 1$ o $x\le 1$.
+# En la *extensión proyectiva*, uno considera la compactificación de $\mathbb{R}$ en el círculo (de radio 1, centrado en (0,1/2)), al considerar la intersección sobre el círculo de la recta que une al punto $x\in\mathbb{R}$ con el polo norte del círculo. Esto introduce un nuevo punto, cuya proyección es el polo norte, que identificamos con el infinito (¡sin signo!). Esta extensión, $\mathbb{R}^*$,  permite que podamos escribir $[c]$ en el ejemplo de arriba como un *intervalo extendido*, $[1, -1]$, donde este intervalo se entiende como los puntos en que $x\ge 1$ o $x\le -1$.
 
 #-
 # La *extensión afín* consiste en dotar de signo a infinito en la extensión de los reales, y se denota como $\overline{\mathbb{R}}$. Esto permite extender $\mathbb{R}$ para que los intervalos $[2,+\infty]$ o $[-\infty, +\infty]$ tengan sentido. Esta es la extensión que solemos, ingenuamente, usar. En este caso, $[c]$ no es un intervalo, pero la división se puede extender resultando en la unión de dos intervalos bien definidos. El conjunto de intervalos formados por esta extensión de los reales se denota $\overline{\mathbb{IR}}$.
@@ -266,13 +266,15 @@
 
 #-
 # La idea de los conjuntos contenedores es un poco más amplia, siendo el objetivo tener una evaluación de funciones libre de excepciones, donde todas evaluaciones están bien definidas. En este caso, los intervalos se definen en $\overline{\mathbb{R}}$, es decir, incluyen $+\infty$ y $-\infty$. Así, se define la extensión *cset*, a conjuntos contenedores, como
+#
 # $$
-# f^*(S) = R(f; S\cap D_f) \cup \{ \lim{{\zeta\to\zeta^*} f(\zeta}): \zeta\in D_f, \zeta^*\in S\setminus D_f \},
+# f^*(S) = R(f; S\cap D_f) \cup \{ \lim_{\zeta\to\zeta^*}\, f(\zeta): \zeta\in D_f, \zeta^*\in S\setminus D_f \},
 # $$
+#
 # donde $D_f$ es el dominio natural de $f$. En el ejemplo anterior, el segundo conjunto que aparece en esta definición resulta ser el conjunto vacío.
 
 #-
-# Antes de finalizar, vale la pena observar otra cuestión del ejemplo $f(x) = \sqrt{x-x^2}$ evaluada en $x\in[0,1]$. Podemos reescribir $f(x)=\sqrt{x(1-x)}$; evaluando en $[0,1]$ esta expresión obtenemos $F([0,1])=\sqrt{[0,1]*[0,1]}=[0,1]$. Más allá del uso (o no) dl dominio natural de la raíz cuadrada, observamos que reescribiendo la expresión resulta en un intervalo *más estrecho* ($[0,1]$) del argumento de la raíz cuadrada, que el obtenido inicialmente ($[-1,1]$). Este es un ejemplo de un *problema* que aparece a la hora de usar intervalos: el problema de la dependencia.
+# Antes de finalizar, vale la pena observar otra cuestión del ejemplo $f(x) = \sqrt{x-x^2}$ evaluada en $x\in[0,1]$. Podemos reescribir $f(x)=\sqrt{x(1-x)}$; evaluando en $[0,1]$ esta expresión obtenemos $F([0,1])=\sqrt{[0,1]*[0,1]}=[0,1]$. Más allá del uso (o no) dl dominio natural de la raíz cuadrada, observamos que reescribiendo la expresión resulta en un intervalo *más estrecho* ($[0,1]$) del argumento de la raíz cuadrada, que el obtenido inicialmente ($[-1,1]$). Este es un ejemplo de un *problema* que aparece a la hora de usar intervalos: el *problema de la dependencia*.
 
 #-
 # ---
