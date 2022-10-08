@@ -15,6 +15,7 @@ using Intervalos
     f = Intervalo(prevfloat(Inf))
     emptyFl = intervalo_vacio(Float64)
     emptyB = intervalo_vacio(BigFloat)
+    realesFl = Intervalo(-Inf,Inf)
 
     @testset "Creación de intervalos" begin
         @test typeof(a) == Intervalo{Float64}
@@ -31,6 +32,8 @@ using Intervalos
 
         @test typeof(emptyFl) == Intervalo{Float64}
         @test typeof(emptyB) == Intervalo{BigFloat}
+        @test typeof(realesFl) == Intervalo{Float64}
+        @test getfield(realesFl, :supremo) == Inf
 
         @test u == Intervalo(1.0)
         @test z == Intervalo(0.0)
@@ -61,6 +64,8 @@ using Intervalos
         @test a ∩ emptyFl == emptyFl
         @test a ∩ c == emptyB
         @test 0 ∈ z
+        @test Inf ∉ realesFl
+        @test Inf ∉ emptyFl
         @test 2 ∈ a
         @test 3 ∉ a
         @test 0.1 ∈ c
@@ -74,7 +79,7 @@ using Intervalos
         @test -u == Intervalo(-u.supremo, -u.infimo)
         @test f + f !== intervalo_vacio(f)
         @test f + f == Intervalo(f.infimo, Inf)
-        @test Inf ∈ f + f
+        @test getfield(f + f, :supremo) == Inf
         @test -u ⪽ z - u
         @test b + 1 == 1.0 + b == Intervalo(prevfloat(2.0), nextfloat(4.0))
         @test d ⪽ 2*(a - 2)
