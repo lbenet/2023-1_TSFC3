@@ -1,0 +1,13 @@
+name = "Intervalos"
+uuid = "a6196f66-7627-4029-b0f7-8fd1707fe0d4"
+authors = ["Luis Benet et al"]
+version = "0.0.1"
+
+[compat]
+julia = "1"
+
+[extras]
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[targets]
+test = ["Test"]
