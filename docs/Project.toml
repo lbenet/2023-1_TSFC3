@@ -1,3 +1,6 @@
 [deps]
+IntervalArithmetic = "d1acc4aa-44c8-5952-acd4-ba5d80a2a253"
 Literate = "98b081ad-f1c9-55d3-8b20-4c87d4299306"
 Plots = "91a5bcdd-55d7-5caf-9e0b-520d859cae80"
+TikzGraphs = "b4f28e30-c73f-5eaf-a395-8a9db949a742"
+TreeView = "39424ebd-4cf3-5550-a685-96706a953f40"
