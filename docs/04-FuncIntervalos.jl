@@ -25,7 +25,7 @@
 # \begin{align*}
 # \sqrt{[x]} & = [\sqrt{\underline{x}}, \sqrt{\overline{x}}], & \underline{x}\ge 0,\\
 # \exp([x]) & = [\exp(\underline{x}), \exp(\overline{x})], & \\
-# \log([x]) & = [\log(\overline{x}), \log(\underline{x})], & \underline{x} > 0, \\
+# \log([x]) & = [\log(\underline{x}), \log(\overline{x})], & \underline{x} > 0, \\
 # \arctan([x]) & = [\arctan(\underline{x}), \arctan(\overline{x})]. &
 # \end{align*}
 # $$
