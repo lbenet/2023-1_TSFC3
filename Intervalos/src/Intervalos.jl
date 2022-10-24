@@ -9,5 +9,6 @@ module Intervalos
 # Deben descomentar y cambiar para que se carguen apropiadamente
 # sus archivos, la(s) siguientes líneas:
 # include("zYo/intervalos.jl")
+include("lerm/intervalos.jl")
 
 end
