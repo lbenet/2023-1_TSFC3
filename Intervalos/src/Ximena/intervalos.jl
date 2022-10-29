@@ -20,7 +20,7 @@ struct Intervalo{T<:Real}
     end
 end
 
-Intervalo(x) = Intervalo(x,x) #intervalo delgado
+Intervalo(x) = Intervalo(x,x) #para un intervalo delgado
 
 function intervalo_vacio(S::Type)
 #ya que NaN::S da error cuando S=BigFloat, en este caso definiremos intervalo con big(NaN)
