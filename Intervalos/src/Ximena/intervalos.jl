@@ -1,5 +1,4 @@
 ### Ejercicio 1: Módulo `Intervalos`
-#module Intervalos
 export Intervalo, intervalo_vacio, ⪽, ⊔, division_extendida
 import Base: ==, ∪, ∩, ∈, ∉, ⊆, +, -, *, /, ^, isempty, inv
 
@@ -230,9 +229,9 @@ function /(a::Intervalo, b::Intervalo)
     isempty(a) && return intervalo_vacio(a)
     isempty(b) && return intervalo_vacio(b)
     0 ∉ b && return a*Intervalo(1/b.supremo,1/b.infimo)
-    if 0 ∈ b
-        b == Intervalo(0.0) && return intervalo_vacio(b)
-        b.infimo < 0.0 < b.supremo && return Intervalo(-Inf, Inf)
+    if 0 ∈ b #si 0 en b revisamos cada posible caso
+        b == Intervalo(0.0) && return intervalo_vacio(b) #si b es delgado de 0
+        b.infimo < 0.0 < b.supremo && return Intervalo(-Inf, Inf) #si b esta dentro del intervalo
 
         # si el infimo es 0 lo quitamos haciendo 1/supremo de b al infinito positivo
         0.0 == b.infimo < b.supremo && return Intervalo(prevfloat(min(a.infimo*(1/b.supremo), a.supremo*(1/b.supremo))), Inf)
@@ -260,7 +259,9 @@ function /(a::Real,b::Intervalo)
         b.infimo < 0.0 == b.supremo && return Intervalo(-Inf,nextfloat(a/b.infimo))
     end
     if 0.0 ∉ b
+        #para a positiva 
         0 ≤ a && return Intervalo(prevfloat(a/b.supremo), nextfloat(a/b.infimo))
+        #para a negativa intercambiamos los extremos
         a < 0 && return Intervalo(prevfloat(a/b.infimo), nextfloat(a/b.supremo))
     end
 end
@@ -282,7 +283,7 @@ end
 #Para potencias negativas extendamos inv, primero veremos que no sea un intervalo (0,0), luego tomamos el inverso del supremo como infimo del nuevo intervalo y el inverso del infimo como el supremos, además ensanchamos el intervalo para asegurar que los extremos se encuentren dentro del intervalo resultante
 
 function inv(a::Intervalo)
-    a == Intervalo(0) && return intervalo_vacio(BigFloat)
+    a == Intervalo(0) && return intervalo_vacio(BigFloat) #BigFloat para que no haya problema
     return Intervalo(1.0)/a #Intervalo(prevfloat(1/a.supremo), nextfloat(1/a.infimo))
 end
 
@@ -305,13 +306,13 @@ function ^(a::Intervalo, n::Int64)
             
             inf = min(a.infimo^n,a.supremo^n)
             sup = max(a.infimo^n,a.supremo^n)
-            inf == 0 && return Intervalo(0,nextfloat(sup))
+            inf == 0 && return Intervalo(0,nextfloat(sup)) #para no redondear 0 que es representable
             return Intervalo(prevfloat(inf),nextfloat(sup))
             #ensanchamos un poco el intervalo
             #para no perder información y garantizar que los extremos estén dentro
         end
     else #si es impar se conservan los signos
-        a.infimo^n == 0 && return Intervalo(0,nextfloat(sup))
+        a.infimo^n == 0 && return Intervalo(0,nextfloat(sup)) #para no redondear 0's
         a.supremo^n == 0 && return(prevfloat(a.infimo^n),0)
         return Intervalo(prevfloat(a.infimo^n), nextfloat(a.supremo^n))
     end
@@ -344,9 +345,10 @@ function division_extendida(a::Intervalo, b::Intervalo)
     #caso 8 a positiva, b positivo con cero en el infimo
     elseif 0.0 < a.infimo && 0 == b.infimo < b.supremo
         return (Intervalo(prevfloat(a.infimo/b.supremo), Inf) , )
+    #caso 9 a sin 0 y b intervalo delgado de 0 (asi no esta indeterminado)
     elseif 0.0 ∉ a && b == Intervalo(0)
         return (intervalo_vacio(BigFloat), )
     end
 end
-#end
+
 
