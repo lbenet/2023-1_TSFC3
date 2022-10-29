@@ -1,5 +1,5 @@
 ### Ejercicio 1: Módulo `Intervalos`
-module Intervalos
+#module Intervalos
 export Intervalo, intervalo_vacio, ⪽, ⊔, division_extendida
 import Base: ==, ∪, ∩, ∈, ∉, ⊆, +, -, *, /, ^, isempty, inv
 
@@ -348,5 +348,5 @@ function division_extendida(a::Intervalo, b::Intervalo)
         return (intervalo_vacio(BigFloat), )
     end
 end
-end
+#end
 
