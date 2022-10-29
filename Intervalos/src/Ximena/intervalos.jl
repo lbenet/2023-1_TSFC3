@@ -348,4 +348,5 @@ function division_extendida(a::Intervalo, b::Intervalo)
         return (intervalo_vacio(BigFloat), )
     end
 end
+end
 
