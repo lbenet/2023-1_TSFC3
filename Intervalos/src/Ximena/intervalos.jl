@@ -1,8 +1,8 @@
 ### Ejercicio 1: Módulo `Intervalos`
 module Intervalos
-
-import Base: ==, ∪, ∩, ∈, ∉, ⊆, +, -, *, /, ^, isempty, inv
 export Intervalo, intervalo_vacio, ⪽, ⊔, division_extendida
+import Base: ==, ∪, ∩, ∈, ∉, ⊆, +, -, *, /, ^, isempty, inv
+
 """
 Intervalo{T}
 El siguiente código esta basado en lo visto en clase
@@ -348,4 +348,4 @@ function division_extendida(a::Intervalo, b::Intervalo)
         return (intervalo_vacio(BigFloat), )
     end
 end
-end
+
