@@ -1,21 +1,10 @@
 ### Ejercicio 1: Módulo `Intervalos`
+module Intervalos
+
+import Base: ==, ∪, ∩, ∈, ∉, ⊆, +, -, *, /, ^, isempty, inv
+export Intervalo, intervalo_vacio, ⪽, ⊔, division_extendida
 """
-- Definan la estructura paramétrica `Intervalo{T}`, que debe funcionar usando un ínfimo y un
-    supremo al menos del tipo `Float64` y `BigFoat`, que definirá al parámetro `T`.
-    Deberán escribir una o más funciones (*constructores*) que permitan, entre otras,
-    usar `Intervalo(a)`, con `a::Float64` o `a::BigFloat`, para crear un intervalo delgado.
-    El constructor no debe involucrar ningún tipo de redondeo. Si los tipos del ínfimo y
-    del supremo no coinciden, `Intervalo` deberá promover los tipos correctamente.
-    Definan cómo debe comportarse `Intervalo` si se utiliza con parámetros incorrectos,
-    por ejemplo, el ínfimo es mayor que el supremo.
-
-- Definan la función `intervalo_vacio`, que depende del *tipo*, que devuelve al `Intervalo`
-    que corresponde al intervalo sin elementos (al conjunto vacío). Su implementación al
-    definir al intervalo vacío debe ser tal que su estructura permita definirlo, quizás
-    como un caso especial.
-
-
-    Intervalo{T}
+Intervalo{T}
 El siguiente código esta basado en lo visto en clase
 
 """
@@ -49,24 +38,6 @@ function intervalo_vacio(z::Intervalo{T}) where {T<:Real}
 end
 
 ### Ejercicio 2: Operaciones básicas
-"""
-- Extiendan las relaciones de conjuntos `==`, `issubset` (`⊆`), `isinterior` (`⪽`), `in` (`∈`),
-    `hull` (`⊔`), `intersect` (`∩`) para usarlas con dos intervalos. Noten que los
-    símbolos `⪽` y `⊔` no existen en Julia y deberá ser posible usarlos. La función
-    `union` (`∪`) deberá ser sinónima de `hull`. (Para usar símbolos en lugar de nombres de
-    funciones, pueden usar el nombre común (`hull`) y definir `const ⊔ = hull`.)
-
-- Extiendan las funciones aritméticas (`+`, `-`, `*`, `/`). Estas operaciones
-    deberán devolver el `Intervalo` apropiado, incluyendo el redondeo; para implementar
-    el redondeo, deberán usar `prevfloat` y `nextfloat`. Asegúrense que las operaciones aritméticas,
-    cuando tengan sentido (e.g., `1/a`), puedan involucrar un número entero, `Float64` o `BigFoat`,
-    entre otros (es decir, `<:Real`), y un intervalo, o incluso sólo un intervalo (por ejemplo,
-    `-a`, con `a::Intervalo`).
-
-- Extiendan las potencias *enteras* para intervalos. Noten que, por ejemplo, `a^2` no corresponde
-    a `a*a`; la potencia (con enteros) debe devolver el *rango* apropiado de la función, incluyendo
-    el redondeo.
-"""
 ## Operaciones de conjuntos ##################################
 
 import Base: ==, ∪, ∩, ∈, ∉, ⊆, +, -, *, /, ^, isempty, inv
@@ -347,27 +318,7 @@ function ^(a::Intervalo, n::Int64)
 end
 
 ### División extendida ##########################################
-#
-#Recordemos que la división extendida se define como
-#
-#$$
-#[a]\div[b] = \begin{cases}
-#\begin{align*}
-#& [a] \times [1/\overline{b}, 1/\underline{b}], &\textrm{si }& 0\notin [b], \\
-#& [-\infty,+\infty], &\textrm{si }& 0\in[a] \textrm{ y } 0\in[b], \\
-#& [\overline{a}/\underline{b}, +\infty], &\textrm{si }& \overline{a}<0 \textrm{ y } \underline{b}<\overline{b}=0, \\
-#& [\overline{a}/\underline{b},+\infty]\cup[-\infty,\overline{a}/\overline{b}], &\textrm{si }& \overline{a}<0 \textrm{ y } \underline{b}<0<\overline{b}, \\
-#& [-\infty, \overline{a}/\overline{b}], &\textrm{si }& \overline{a}<0 \textrm{ y } 0=\underline{b}<\overline{b}, \\
-#& [-\infty, \underline{a}/\underline{b}], &\textrm{si }& 0<\underline{a} \textrm{ y } \underline{b}<\overline{b}=0, \\
-#& [\underline{a}/\overline{b}, +\infty]\cup[-\infty,\underline{a}/\underline{b}], &\textrm{si }& 0<\underline{a} \textrm{ y } \underline{b}<0<\overline{b}, \\
-#& [\underline{a}/\overline{b}, +\infty], &\textrm{si }& 0<\underline{a} \textrm{ y } 0=\underline{b}<\overline{b}, \\
-#& [\varnothing], &\textrm{si }& 0\notin [a] \textrm{ y } [b]=[0,0].\\
-#\end{align*}
-#\end{cases}
-#$$
-
-
-#Definiendo la división extendida 
+ 
 function division_extendida(a::Intervalo, b::Intervalo)
     0.0 ∉ b && return (a/b,) #caso 1 como ya definimos asi la división antes, solo la invocamos
     #caso 2, 0 ∈ [a],[b]=> [-inf,inf]
@@ -397,4 +348,4 @@ function division_extendida(a::Intervalo, b::Intervalo)
         return (intervalo_vacio(BigFloat), )
     end
 end
-
+end
