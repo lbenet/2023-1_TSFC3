@@ -1,10 +1,6 @@
 #-
 # # Análisis con intervalos 1
 
-#-
-# > Ref: W. Tucker, Validated Numerics: A Short Introduction to Rigorous Computations, Princeton University Press, 2011
-
-#-
 # ## Funciones evaluadas en intervalos
 
 #-
@@ -78,13 +74,13 @@ using TreeView
 @dag (x^2 - sin(x)) * (x^7 + 3sin(x^2))
 
 #-
-# La idea, entonces, es substituir $x$ por el intervalo $[x]$ en cada subexpresión, empezando en las hojas del árbol. Sin embargo, y por las propiedades intrínsecas de los intervalos (*el problema de la dependencia*), la extensión a intervalos $F$ que se obtiene depende de la representación particular de $f$. Esencialmente lo que esto impone es que, si la variable $x$ aparece más de una vez, podemos espera que el problema de la dependencia aparecerá, y el rango de la función estará contenido en $F([x])$, pero no de manera estrecha. El punto importante es que el rango $R(f; x)$ está contenido en la extensión a intervalos $F([x])$ por la inclusión isotónica.
+# La idea, entonces, es substituir $x$ por el intervalo $[x]$ en cada subexpresión, empezando en las hojas del árbol. Sin embargo, y por las propiedades intrínsecas de los intervalos (*el problema de la dependencia*), la extensión a intervalos $F$ que se obtiene depende de la representación particular de $f$. Esencialmente lo que esto impone es que, si la variable $x$ aparece más de una vez, podemos espera que el problema de la dependencia aparecerá, y el rango de la función estará contenido en $F([x])$, pero no de manera estrecha. El punto importante es que el rango $R(f; [x])$ está contenido en la extensión a intervalos $F([x])$ por la inclusión isotónica.
 
 #-
 # **Teorema** (Teorema fundamental de la aritmética de intervalos). Dada una función elemental $f(x)$ y su extensión natural a intervalos $F$ de tal manera que $F([x])$ está bien definida para algún $[x]\in \mathbb{IR}$, entonces se cumple:
 #
 # 1. $[z]\subseteq [z']\subseteq [x] \Rightarrow F([z])\subseteq F([z'])$, i.e., inclusión monótona,
-# 1. $R(f; x) \subseteq F([x])$, i.e., inclusión de rango.
+# 1. $R(f; [x]) \subseteq F([x])$, i.e., inclusión de rango.
 
 #-
 # La importancia de este teorema es que tenemos una manera de acotar el rango de funciones elementales; si bien $R(f;[x])$ es difícil de obtener, el rango estará contenido en la extensión a intervalos de la función $F([x])$. Este resultado puede ser explotado considerando su negativo: Si $y\notin F([x])$ entonces $y\notin R(f;[x])$. Esta última formulación será muy útil cuando busquemos los ceros de una función $f(x)$, ya que si $0\notin F([x])$ entonces sabremos que $[x]$ no incluye ningún punto tal que $f(x)=0$.
