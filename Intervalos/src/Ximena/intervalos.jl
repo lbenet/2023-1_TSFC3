@@ -284,7 +284,7 @@ end
 
 function inv(a::Intervalo)
     a == Intervalo(0) && return intervalo_vacio(BigFloat) #BigFloat para que no haya problema
-    return Intervalo(1.0)/a #Intervalo(prevfloat(1/a.supremo), nextfloat(1/a.infimo))
+    return Intervalo(1.0)/a 
 end
 
 function ^(a::Intervalo, n::Int64)
@@ -295,9 +295,6 @@ function ^(a::Intervalo, n::Int64)
     n == -1 && return 1/a
     #Ahora veamos el caso de potencia par primero
     if n%2 == 0 #verificando si es par
-        #if abs(a.infimo) == 1 && abs(a.supremo) == 1
-            
-            #return a
         if a.infimo < 0 && a.supremo > 0
             #inf = 0 #comentado, no tiene caso usar memoria aqui para guardad el 0
             #sup = max(a.infimo^n,a.supremo^n) #como la pot es par no importa el signo de inf o sup
@@ -331,7 +328,7 @@ function division_extendida(a::Intervalo, b::Intervalo)
     #caso 4, a negativo sin cero, 0 ∈ b
     elseif a.supremo < 0.0 && b.infimo < 0.0 < b.supremo
     #tomamos ambos intervalos, primero el que viene de -inf, y despues el que va a +inf, asi abarcamos la union de ambos
-        return (Intervalo(-Inf, nextfloat(a.supremo/b.supremo)), Intervalo(prevfloat(A.supremo/B.infimo), Inf),)
+        return (Intervalo(-Inf, nextfloat(a.supremo/b.supremo)), Intervalo(prevfloat(a.supremo/b.infimo), Inf),)
     #caso 5 intervalo a debajo de 0 e infimo de b igual a 0  
     elseif a.supremo < 0.0 && 0.0 == b.infimo < b.supremo
         return (Intervalo(-Inf, nextfloat(a.supremo/b.supremo)), )
