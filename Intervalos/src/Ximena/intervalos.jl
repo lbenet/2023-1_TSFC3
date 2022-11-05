@@ -23,12 +23,8 @@ end
 Intervalo(x) = Intervalo(x,x) #para un intervalo delgado
 
 function intervalo_vacio(S::Type)
-#ya que NaN::S da error cuando S=BigFloat, en este caso definiremos intervalo con big(NaN)
-    if S == BigFloat
-        Intervalo(big(NaN))
-    else #si no es bigfloat, lo definimos como usualmente
-        Intervalo(S(NaN))  
-    end
+# #ya que NaN::S da error cuando S=BigFloat, en este caso definiremos intervalo con big(NaN)
+    return Intervalo(S(NaN))
 end
 
 #Si el argumento es un intervalo tipo T
@@ -38,8 +34,6 @@ end
 
 ### Ejercicio 2: Operaciones básicas
 ## Operaciones de conjuntos ##################################
-
-import Base: ==, ∪, ∩, ∈, ∉, ⊆, +, -, *, /, ^, isempty, inv
 
 """
 Defino el caso de que un intervalo sea vacío, como mi función de intervalo vacío es (NaN, NaN)
@@ -118,7 +112,7 @@ function ∪(a::Intervalo, b::Intervalo)
 end
 
 ### Intersect  ##########################
-#Notemos que se debe agregar el conjunto vacío en caso de que los intervalos sean disjuntos, por lo que, podemos definir la intersección entre dos intercalos como
+#Notemos que se debe agregar el conjunto vacío en caso de que los intervalos sean disjuntos, por lo que, podemos definir la intersección entre dos intervalos como
 
 #$$[a]\cap[b] = $$ $[\oslash]$ si $\overline{b}<\underline{a}$ o $\overline{a}<\underline{b}$
 
@@ -154,37 +148,25 @@ end
 #$$[a] + [b] = [\underline{a} + \underline{b},\overline{a} + \overline{b}]$$
 #además la suma de un intervalo vacío con otro, da el intervalo vacío
 
-function +(a, b)
-    if a isa Intervalo && b isa Intervalo
-        isempty(a) && return a #si un intervalo es vacio devuelve el mismo
-        isempty(b) && return b
-        infim = a.infimo + b.infimo
-        supr = a.supremo + b.supremo
-        return Intervalo(prevfloat(infim),nextfloat(supr))#redondeamos con prevfloat y nextfloat
-    elseif a isa Intervalo && b isa Real
-        a + Intervalo(b)
-    elseif a isa Real && b isa Intervalo
-        Intervalo(a) + b
-    end
+function +(a::Intervalo, b::Intervalo) #si ambos son argumentos
+    isempty(a) && return a #si un intervalo es vacio devuelve el mismo
+    isempty(b) && return b
+    infim = a.infimo + b.infimo
+    supr = a.supremo + b.supremo
+    return Intervalo(prevfloat(infim),nextfloat(supr))#redondeamos con prevfloat y nextfloat
 end
-
++(a::Intervalo, b::Real) = a + Intervalo(b) #si uno es un real, lo hacemos int. delgado y sumamos con el método anterior
++(a::Real, b::Intervalo) = Intervalo(a) + b
 +(a::Intervalo) = a #si solo hay un argumento tipo intervalo regresa el mismo 
 
 ### Resta de intervalos - ##################
 #Para la resta de intervalos tenemos que
 #$$[a] - [b] = [\underline{a} - \overline{b},\overline{a} - \underline{b}]$$
 
-#resta de dos intervalos en general
-function -(a, b)
-    if a isa Intervalo && b isa Intervalo
-        Intervalo(prevfloat(a.infimo - b.supremo), nextfloat(a.supremo - b.infimo))
-    elseif a isa Intervalo && b isa Real
-        a - Intervalo(b)
-    elseif a isa Real && b isa Intervalo
-        Intervalo(a) - b
-    end
-end
-
+#resta de dos intervalos en general, redondeando con prev y next
+-(a::Intervalo, b::Intervalo) = Intervalo(prevfloat(a.infimo - b.supremo), nextfloat(a.supremo - b.infimo))
+-(a::Intervalo, b::Real) = a - Intervalo(b) #analogo a +, se hace intervalo delgado el real y se restan
+-(a::Real, b::Intervalo) = Intervalo(a) - b
 #si solo da una variable tipo intervalo se regresa invertido con signo menos
 -(a::Intervalo) = Intervalo(-a.supremo, -a.infimo) 
 
@@ -192,32 +174,27 @@ end
 #Tenemos que
 #$$[a]x[b] = function [min(\underline{a}\underline{b},\underline{a}\overline{b},\overline{a}\underline{b},\overline{a}\overline{b}),max(\underline{a}\underline{b},\underline{a}\overline{b},\overline{a}\underline{b},\overline{a}\overline{b})]$$
 
-function *(a, b)
-    if a isa Intervalo && b isa Intervalo 
-        #primero notemos que el vacio por algo es el vacio
-        isempty(a) && return intervalo_vacio(a)
-        isempty(b) && return intervalo_vacio(b)
+function *(a::Intervalo, b::Intervalo)
+    #primero notemos que el vacio por algo es el vacio
+    isempty(a) && return intervalo_vacio(a)
+    isempty(b) && return intervalo_vacio(b)
         
-        #Luego el 0 por lo que sea es 0
-        a == Intervalo(0.0) && return a
-        b == Intervalo(0.0) && return b
+    #Luego el 0 por lo que sea es 0
+    a == Intervalo(0.0) && return a
+    b == Intervalo(0.0) && return b
         
-        #ahora definamos los 4 valores a evaluar para hallar los extremos del intervalo resultante
-        aibi = a.infimo*b.infimo
-        aibs = a.infimo*b.supremo
-        asbi = a.supremo*b.infimo
-        asbs = a.supremo*b.supremo
-        #Ponemos todo junto en la expresión
-        Intervalo(prevfloat(min(aibi,aibs,asbi,asbs)),nextfloat(max(aibi,aibs,asbi,asbs)))
+    #ahora definamos los 4 valores a evaluar para hallar los extremos del intervalo resultante
+    aibi = a.infimo*b.infimo
+    aibs = a.infimo*b.supremo
+    asbi = a.supremo*b.infimo
+    asbs = a.supremo*b.supremo
+    #Ponemos todo junto en la expresión
+    Intervalo(prevfloat(min(aibi,aibs,asbi,asbs)),nextfloat(max(aibi,aibs,asbi,asbs)))
+end
     
     #Si multiplican por un numero y no un intervalo
-    elseif a isa Intervalo && b isa Real
-        #en este caso multiplicamos los extremos por el numero real
-        Intervalo(prevfloat(b*a.infimo),nextfloat(b*a.supremo))
-    elseif a isa Real && b isa Intervalo
-        Intervalo(prevfloat(a*b.infimo),nextfloat(a*b.supremo))
-    end
-end 
+*(a::Intervalo, b::Real) = Intervalo(prevfloat(b*a.infimo),nextfloat(b*a.supremo))#multiplicamos los extremos por el numero real
+*(a::Real, b::Intervalo) = Intervalo(prevfloat(a*b.infimo),nextfloat(a*b.supremo))
 
 
 ### División / ######################################
