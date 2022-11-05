@@ -1,5 +1,4 @@
-
-## Definimos la estructura
+#Definimos la estructura Intervalo
 
 struct Intervalo{T<:Real} 
     #Definimos los espacios para el infimo y el supremo.
@@ -13,21 +12,21 @@ struct Intervalo{T<:Real}
         new{typeof(aa)}(aa, bb)
     end
 end
-
-#Definimos una función para poder hacer u intervalo delgado
+#Creamos una función para los intervalos delgados
 Intervalo(x) = Intervalo(x,x)
 
-#Definimos una función para el intervalo intervalo_vacio
+export Intervalo
 
+#Creamos la función intervalo_vacio
 function intervalo_vacio(x)
     Intervalo(x(NaN))
 end
-   
-#para solucionar los problemas con NaN el profe recomienda usar la funcion "isnan"
 
-## Relaciones de conjuntos 
+export intervalo_vacio
+
+# Sobrecargamos y creamos funciones para las relaciones de conjuntos
 import Base: == 
-# Definimos una función para comparar si dos intervalos son iguales
+
 function ==(a::Intervalo,b::Intervalo)
     if isnan(getfield(a, :infimo)) && isnan(getfield(b, :infimo))
         return true
@@ -39,7 +38,7 @@ function ==(a::Intervalo,b::Intervalo)
 end
 
 import Base: ⊆
-#Definimos una función para revisar si un conjunto esta contenido en otro o es igual
+
 function ⊆(a::Intervalo,b::Intervalo)
     if getfield(b, :infimo)≤ getfield(a, :infimo) && getfield(a, :supremo)≤getfield(b, :supremo)
         return true
@@ -47,7 +46,7 @@ function ⊆(a::Intervalo,b::Intervalo)
         return false
     end
 end
-#Definimos una función para revisar si un conjunto esta contenido en otro 
+
 function isinterior(a::Intervalo,b::Intervalo)
     if a⊆b && a!=b
         return true
@@ -56,10 +55,12 @@ function isinterior(a::Intervalo,b::Intervalo)
     end
 end
 
-const ⪽ = isinterior #definimos el sibolo para contención 
+const ⪽ = isinterior 
+
+export ⪽
 
 import Base: ∈
-#Definimos una función para revisar si un elemento está dentro de un intervalo
+
 function ∈(a::T,b::Intervalo) where {T<:Real}
     if getfield(b, :infimo)≤ a ≤ getfield(b, :supremo)
         return true
@@ -74,6 +75,13 @@ function hull(a::Intervalo,b::Intervalo)
     return Intervalo(infimo,supremo)
 end
 
+const ⊔ = hull
+
+export ⊔
+
+import Base: ∪
+∪(a::Intervalo,b::Intervalo)= ⊔(a,b)
+
 import Base: ∩
 
 function ∩(a::Intervalo,b::Intervalo)
@@ -86,7 +94,7 @@ function ∩(a::Intervalo,b::Intervalo)
     end
 end
 
-### Funciones aritméticas
+#Ahora sobrecargaremos las funciones aritmetica
 
 import Base: +
 
@@ -116,23 +124,105 @@ function -(a,b::Intervalo)
     end
 end
 
+-(a::Intervalo)=Intervalo(-getfield(b, :supremo),-getfield(b, :infimo))
+
 import Base: *
 
 function *(a,b::Intervalo)
-    in_a=getfield(a, :infimo)
-    su_a=getfield(a, :supremo)
     in_b=getfield(b, :infimo)
-    su_b=getfield(a, :supremo)
+    su_b=getfield(b, :supremo)
     
     if typeof(a)<:Real
         infimo=min(prevfloat(a*in_b),prevfloat(a*su_b))
         supremo=max(nextfloat(a*in_b),nextfloat(a*su_b))
         return Intervalo(infimo,supremo)
     else
+        in_a=getfield(a, :infimo)
+        su_a=getfield(a, :supremo)
+        
         infimo=min(prevfloat(in_a*in_b),prevfloat(in_a*su_b),prevfloat(su_a*in_b),prevfloat(su_a*su_b))
         supremo=max(nextfloat(in_a*in_b),nextfloat(in_a*su_b),nextfloat(su_a*in_b),nextfloat(su_a*su_b))
         return Intervalo(infimo,supremo)
     end
 end
 
+import Base: /
 
+function /(a,b::Intervalo)
+    in_b=getfield(b, :infimo)
+    su_b=getfield(b, :supremo)
+    
+    if 0 ∈ b
+        error("0 pertenece al intervalo en el denominador")      
+    elseif typeof(a)<:Real
+        infimo=min(prevfloat(a/in_b),prevfloat(a/su_b))
+        supremo=max(nextfloat(a/in_b),nextfloat(a/su_b))
+        return Intervalo(infimo,supremo)
+    else
+        in_a=getfield(a, :infimo)
+        su_a=getfield(a, :supremo)
+        
+        infimo=min(prevfloat(in_a/in_b),prevfloat(in_a/su_b),prevfloat(su_a/in_b),prevfloat(su_a/su_b))
+        supremo=max(nextfloat(in_a/in_b),nextfloat(in_a/su_b),nextfloat(su_a/in_b),nextfloat(su_a/su_b))
+        return Intervalo(infimo,supremo)
+    end
+end
+
+# Definimos la función para las potencias enteras
+
+import Base: ^
+
+function ^(a::Intervalo,b::Int64)
+    if b==0
+        return Intervalo(1,1)
+    end
+    
+    a_in=getfield(a,:infimo)^b
+    a_su=getfield(a,:supremo)^b
+    
+    if b%2!=0
+        return Intervalo(a_in,a_su)
+    else
+        if getfield(a,:infimo) ≤ 0 && getfield(a,:supremo) ≥ 0
+            supremo= max(a_in,a_su)
+            return Intervalo(0,supremo)
+        else 
+            infimo=min(a_in,a_su)
+            supremo=max(a_in,a_su)
+            return (infimo,supremo)
+        end
+    end
+end
+
+#Definimos la función division_extendida de acuerdo a lo visto en clase.
+
+function division_extendida(a::Intervalo,b::Intervalo)
+    in_a=getfield(a, :infimo)
+    su_a=getfield(a, :supremo)
+    in_b=getfield(b, :infimo)
+    su_b=getfield(b, :supremo)
+    
+    if 0 ∉ b
+        return a/b
+    elseif 0 ∈ a && 0 ∈ b
+        return Intervalo(-Inf,Inf)
+    elseif su_a <0 && in_b < su_b==0
+        return Intervalo(su_a/in_b,Inf)
+    elseif su_a <0 && in_b < 0 < su_b
+        println(Intervalo(su_a/in_b,Inf)," ∪ ",Intervalo(-Inf,su_a/su_b))
+        return (Intervalo(su_a/in_b,Inf),Intervalo(-Inf,su_a/su_b))
+    elseif su_a <0 && 0==in_b < su_b
+        return Intervalo(-Inf,su_a/su_b)
+    elseif 0 < in_a && in_b < su_b==0
+        return Intervalo(-Inf,in_a/in_b)
+    elseif 0 < in_a && in_b < 0 < su_b
+        println(Intervalo(in_a/su_b,Inf)," ∪ ",Intervalo(-Inf,in_a/in_b))
+        return (Intervalo(in_a/su_b,Inf), Intervalo(-Inf,in_a/in_b))
+    elseif 0 < in_a && 0==in_b < su_b
+        return Intevalo(in_a/su_b,Inf)
+    elseif 0 ∉ a && b==Intervalo(0,0)
+        return intervalo_vacio(typeof(in_a))
+    end
+end
+
+export division_extendida
