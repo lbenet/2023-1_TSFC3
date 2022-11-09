@@ -22,5 +22,6 @@ desde el directorio *raíz* del curso. En ambos casos, el archivo `Intervalos/te
 
 |                   | Aceptación del PR  |         Estado         |
 |:------------------|:------------------:|:----------------------:|
-|        Tarea 1    |  14/10/2023        | Abierta    |
+|        Tarea 1    |  11/11/2023        | Abierta    |
+|        Tarea 2    |  28/11/2023        | Abierta    |
 | | |
