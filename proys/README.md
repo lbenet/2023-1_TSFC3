@@ -11,8 +11,10 @@ equipo o de manera individual; esto se hará comentando en un issue que se
 abrirá para esto. Los proyectos desarrollados serán distintos entre sí.
 Los proyectos deben ser enviados (subidos al repositorio del curso)
 **antes del 2 de diciembre**; **no habrán extensiones**. Los proyectos
-se subirán en un directorio (independiente) por proyecto, y deberán contener
-todo el material necesario: código (documentado!) y presentación.
+se subirán en un directorio (independiente) por proyecto, dentro de
+este mismo directorio, y deberán contener
+todo el material necesario: código (documentado!), paquetes requeridos
+en el archivo `Project.toml` que permita reproducir los cálculos, y la presentación.
 
 A continuación se presentan algunas ideas de proyectos de fin de semestre
 con algunas referencias. Se pueden considerar otras ideas para el proyecto,
