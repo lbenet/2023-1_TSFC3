@@ -3,6 +3,9 @@ uuid = "a6196f66-7627-4029-b0f7-8fd1707fe0d4"
 authors = ["Luis Benet et al"]
 version = "0.0.1"
 
+[deps]
+ForwardDiff = "f6369f11-7733-5829-9624-2563aa707210"
+
 [compat]
 julia = "1"
 
