@@ -15,6 +15,8 @@ end
 #Creamos una función para los intervalos delgados
 Intervalo(x) = Intervalo(x,x)
 
+intervalo_vacio(a::Intervalo)=intervalo_vacio(typeof(getfield(a, :infimo)))
+
 export Intervalo
 
 #Creamos la función intervalo_vacio
@@ -40,11 +42,13 @@ end
 import Base: ⊆
 
 function ⊆(a::Intervalo,b::Intervalo)
-    if getfield(b, :infimo)≤ getfield(a, :infimo) && getfield(a, :supremo)≤getfield(b, :supremo)
-        return true
-    else
-        return false
-    end
+    if isnan(getfield(a, :infimo))
+        return true 
+     elseif getfield(b, :infimo)≤ getfield(a, :infimo) && getfield(a, :supremo)≤getfield(b, :supremo)
+         return true
+     else
+         return false
+     end
 end
 
 function isinterior(a::Intervalo,b::Intervalo)
@@ -62,7 +66,9 @@ export ⪽
 import Base: ∈
 
 function ∈(a::T,b::Intervalo) where {T<:Real}
-    if getfield(b, :infimo)≤ a ≤ getfield(b, :supremo)
+    if abs(a)>prevfloat(Inf)
+        return false
+    elseif getfield(b, :infimo)≤ a ≤ getfield(b, :supremo)
         return true
     else
         return false
@@ -70,9 +76,15 @@ function ∈(a::T,b::Intervalo) where {T<:Real}
 end
 
 function hull(a::Intervalo,b::Intervalo)
-    infimo=min(getfield(a, :infimo),getfield(b, :infimo)) #¿por qué el maximo de un numero y NaN es NaN?
-    supremo=max(getfield(a, :supremo),getfield(b, :supremo))
-    return Intervalo(infimo,supremo)
+    if isnan(getfield(a, :infimo))
+        return b
+    elseif isnan(getfield(b, :infimo))
+        return a
+    else
+        infimo=min(getfield(a, :infimo),getfield(b, :infimo)) #¿por qué el maximo de un numero y NaN es NaN?
+        supremo=max(getfield(a, :supremo),getfield(b, :supremo))
+        return Intervalo(infimo,supremo)
+    end
 end
 
 const ⊔ = hull
@@ -110,6 +122,10 @@ function +(a,b::Intervalo)
     end
 end
 
++(a::Intervalo,b)=+(b,a)
+
++(a::Intervalo,b::Intervalo)=Intervalo(prevfloat(getfield(a, :infimo)+getfield(b, :infimo)),nextfloat(getfield(a, :supremo)+getfield(b, :supremo)))
+
 import Base: -
 
 function -(a,b::Intervalo)
@@ -125,6 +141,8 @@ function -(a,b::Intervalo)
 end
 
 -(a::Intervalo)=Intervalo(-getfield(b, :supremo),-getfield(b, :infimo))
+
+-(a::Intervalo,b::Real)=Intervalo(prevfloat(getfield(a, :infimo)-b),nextfloat(getfield(a, :supremo)-b))
 
 import Base: *
 
@@ -145,6 +163,8 @@ function *(a,b::Intervalo)
         return Intervalo(infimo,supremo)
     end
 end
+
+*(a::Intervalo,b::Real)=*(b,a)
 
 import Base: /
 
