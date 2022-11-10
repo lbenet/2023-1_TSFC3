@@ -15,7 +15,6 @@ end
 #Creamos una función para los intervalos delgados
 Intervalo(x) = Intervalo(x,x)
 
-intervalo_vacio(a::Intervalo)=intervalo_vacio(typeof(getfield(a, :infimo)))
 
 export Intervalo
 
@@ -23,6 +22,9 @@ export Intervalo
 function intervalo_vacio(x)
     Intervalo(x(NaN))
 end
+
+intervalo_vacio(a::Intervalo)=intervalo_vacio(typeof(getfield(a, :infimo)))
+
 
 export intervalo_vacio
 
@@ -98,7 +100,7 @@ import Base: ∩
 
 function ∩(a::Intervalo,b::Intervalo)
     if getfield(b, :supremo)<getfield(a, :infimo) || getfield(a, :supremo)<getfield(b, :infimo)
-        return Intervalo_vacio(typeof(a)) #¿qué pasa si los tipos de los intervalos son distintos?
+        return intervalo_vacio(typeof(getfield(a, :infimo))) #¿qué pasa si los tipos de los intervalos son distintos?
     else 
         infimo=max(getfield(a, :infimo),getfield(b, :infimo))
         supremo=min(getfield(a, :supremo),getfield(b, :supremo))
@@ -140,7 +142,7 @@ function -(a,b::Intervalo)
     end
 end
 
--(a::Intervalo)=Intervalo(-getfield(b, :supremo),-getfield(b, :infimo))
+-(a::Intervalo)=Intervalo(-getfield(a, :supremo),-getfield(a, :infimo))
 
 -(a::Intervalo,b::Real)=Intervalo(prevfloat(getfield(a, :infimo)-b),nextfloat(getfield(a, :supremo)-b))
 
@@ -151,6 +153,13 @@ function *(a,b::Intervalo)
     su_b=getfield(b, :supremo)
     
     if typeof(a)<:Real
+        if abs(a)==Inf &&  in_b==0 && su_b==0
+            return Intervalo(0.0)
+        elseif su_b*a==Inf &&  in_b==0 || in_b*a==Inf &&  su_b==0 
+            return Intervalo(0,Inf)
+        elseif su_b*a==-Inf &&  in_b==0 || in_b*a==-Inf &&  su_b==0 
+            return Intervalo(-Inf,0)
+        end      
         infimo=min(prevfloat(a*in_b),prevfloat(a*su_b))
         supremo=max(nextfloat(a*in_b),nextfloat(a*su_b))
         return Intervalo(infimo,supremo)
@@ -158,8 +167,25 @@ function *(a,b::Intervalo)
         in_a=getfield(a, :infimo)
         su_a=getfield(a, :supremo)
         
-        infimo=min(prevfloat(in_a*in_b),prevfloat(in_a*su_b),prevfloat(su_a*in_b),prevfloat(su_a*su_b))
-        supremo=max(nextfloat(in_a*in_b),nextfloat(in_a*su_b),nextfloat(su_a*in_b),nextfloat(su_a*su_b))
+        if isnan(prevfloat(in_a*in_b)) && isnan(prevfloat(su_a*su_b))
+            infimo=0.0
+            supremo=0.0
+        elseif isnan(prevfloat(in_a*in_b))
+            infimo=min(0,prevfloat(in_a*su_b),prevfloat(su_a*in_b),prevfloat(su_a*su_b))
+            supremo=max(0,nextfloat(in_a*su_b),nextfloat(su_a*in_b),nextfloat(su_a*su_b))
+        elseif isnan(prevfloat(in_a*su_b))
+            infimo=min(prevfloat(in_a*in_b),0,prevfloat(su_a*in_b),prevfloat(su_a*su_b))
+            supremo=max(nextfloat(in_a*in_b),0,nextfloat(su_a*in_b),nextfloat(su_a*su_b))
+        elseif isnan(prevfloat(su_a*in_b))
+            infimo=min(prevfloat(in_a*in_b),prevfloat(in_a*su_b),0,prevfloat(su_a*su_b))
+            supremo=max(nextfloat(in_a*in_b),nextfloat(in_a*su_b),0,nextfloat(su_a*su_b))
+        elseif isnan(prevfloat(su_a*su_b))
+            infimo=min(prevfloat(in_a*in_b),prevfloat(in_a*su_b),prevfloat(su_a*in_b),0)
+            supremo=max(nextfloat(in_a*in_b),nextfloat(in_a*su_b),nextfloat(su_a*in_b),0)
+        else 
+            infimo=min(prevfloat(in_a*in_b),prevfloat(in_a*su_b),prevfloat(su_a*in_b),prevfloat(su_a*su_b))
+            supremo=max(nextfloat(in_a*in_b),nextfloat(in_a*su_b),nextfloat(su_a*in_b),nextfloat(su_a*su_b))
+        end
         return Intervalo(infimo,supremo)
     end
 end
@@ -173,7 +199,7 @@ function /(a,b::Intervalo)
     su_b=getfield(b, :supremo)
     
     if 0 ∈ b
-        error("0 pertenece al intervalo en el denominador")      
+        return Intervalo(-Inf, Inf)      
     elseif typeof(a)<:Real
         infimo=min(prevfloat(a/in_b),prevfloat(a/su_b))
         supremo=max(nextfloat(a/in_b),nextfloat(a/su_b))
@@ -195,6 +221,10 @@ import Base: ^
 function ^(a::Intervalo,b::Int64)
     if b==0
         return Intervalo(1,1)
+    end
+
+    if isnan(getfield(a, :infimo))
+        return a
     end
     
     a_in=getfield(a,:infimo)^b
@@ -239,10 +269,14 @@ function division_extendida(a::Intervalo,b::Intervalo)
         println(Intervalo(in_a/su_b,Inf)," ∪ ",Intervalo(-Inf,in_a/in_b))
         return (Intervalo(in_a/su_b,Inf), Intervalo(-Inf,in_a/in_b))
     elseif 0 < in_a && 0==in_b < su_b
-        return Intevalo(in_a/su_b,Inf)
+        return Intervalo(in_a/su_b,Inf)
     elseif 0 ∉ a && b==Intervalo(0,0)
         return intervalo_vacio(typeof(in_a))
     end
 end
+
+import Base: inv
+
+inv(a::Intervalo)=division_extendida(Intervalo(1),a)
 
 export division_extendida
