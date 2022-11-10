@@ -16,6 +16,14 @@ este mismo directorio, y deberán contener
 todo el material necesario: código (documentado!), paquetes requeridos
 en el archivo `Project.toml` que permita reproducir los cálculos, y la presentación.
 
+Es importante enfatizar que la idea principal es que el código
+desarrollado en los proyectos explote lo visto en el curso y
+funcione con las paqueterías desarrolladas; si se quiere
+usar con otras paqueterías (en particular `IntervalArithmetic.jl`,
+por ejemplo, si se quiere usar con funciones más complejas o porque
+se quiere tener cotas más estrechas), el código deberá ser
+extendido de manera adecuada.
+
 A continuación se presentan algunas ideas de proyectos de fin de semestre
 con algunas referencias. Se pueden considerar otras ideas para el proyecto,
 pero vale la pena comentarlas primero con nosotros.
