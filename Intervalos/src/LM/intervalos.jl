@@ -45,12 +45,12 @@ import Base: ⊆
 
 function ⊆(a::Intervalo,b::Intervalo)
     if isnan(getfield(a, :infimo))
-        return true 
-     elseif getfield(b, :infimo)≤ getfield(a, :infimo) && getfield(a, :supremo)≤getfield(b, :supremo)
-         return true
-     else
-         return false
-     end
+       return true 
+    elseif getfield(b, :infimo)≤ getfield(a, :infimo) && getfield(a, :supremo)≤getfield(b, :supremo)
+        return true
+    else
+        return false
+    end
 end
 
 function isinterior(a::Intervalo,b::Intervalo)
@@ -152,6 +152,15 @@ function *(a,b::Intervalo)
     in_b=getfield(b, :infimo)
     su_b=getfield(b, :supremo)
     
+    if a==intervalo_vacio(Real)
+        return a
+    end
+    
+    if b==intervalo_vacio(Real)
+        return b
+    end
+    
+    
     if typeof(a)<:Real
         if abs(a)==Inf &&  in_b==0 && su_b==0
             return Intervalo(0.0)
@@ -199,7 +208,7 @@ function /(a,b::Intervalo)
     su_b=getfield(b, :supremo)
     
     if 0 ∈ b
-        return Intervalo(-Inf, Inf)      
+        return Intervalo(-Inf, Inf)    
     elseif typeof(a)<:Real
         infimo=min(prevfloat(a/in_b),prevfloat(a/su_b))
         supremo=max(nextfloat(a/in_b),nextfloat(a/su_b))
@@ -222,13 +231,13 @@ function ^(a::Intervalo,b::Int64)
     if b==0
         return Intervalo(1,1)
     end
-
+    
     if isnan(getfield(a, :infimo))
         return a
     end
     
-    a_in=getfield(a,:infimo)^b
-    a_su=getfield(a,:supremo)^b
+    a_in=prevfloat(getfield(a,:infimo)^b)
+    a_su=nextfloat(getfield(a,:supremo)^b)
     
     if b%2!=0
         return Intervalo(a_in,a_su)
@@ -257,23 +266,25 @@ function division_extendida(a::Intervalo,b::Intervalo)
     elseif 0 ∈ a && 0 ∈ b
         return Intervalo(-Inf,Inf)
     elseif su_a <0 && in_b < su_b==0
-        return Intervalo(su_a/in_b,Inf)
+        return Intervalo(prevfloat(su_a/in_b),Inf)
     elseif su_a <0 && in_b < 0 < su_b
         println(Intervalo(su_a/in_b,Inf)," ∪ ",Intervalo(-Inf,su_a/su_b))
-        return (Intervalo(su_a/in_b,Inf),Intervalo(-Inf,su_a/su_b))
+        return (Intervalo(prevfloat(su_a/in_b),Inf),Intervalo(-Inf,nextfloat(su_a/su_b)))
     elseif su_a <0 && 0==in_b < su_b
-        return Intervalo(-Inf,su_a/su_b)
+        return Intervalo(-Inf,nextfloat(su_a/su_b))
     elseif 0 < in_a && in_b < su_b==0
-        return Intervalo(-Inf,in_a/in_b)
+        return Intervalo(-Inf,nextfloat(in_a/in_b))
     elseif 0 < in_a && in_b < 0 < su_b
         println(Intervalo(in_a/su_b,Inf)," ∪ ",Intervalo(-Inf,in_a/in_b))
-        return (Intervalo(in_a/su_b,Inf), Intervalo(-Inf,in_a/in_b))
+        return (Intervalo(prevfloat(in_a/su_b),Inf), Intervalo(-Inf,nextfloat(in_a/in_b)))
     elseif 0 < in_a && 0==in_b < su_b
-        return Intervalo(in_a/su_b,Inf)
+        return Intevalo(prevfloat(in_a/su_b),Inf)
     elseif 0 ∉ a && b==Intervalo(0,0)
         return intervalo_vacio(typeof(in_a))
     end
 end
+
+/(a::Intervalo,b::Intervalo)=division_extendida(a,b)
 
 import Base: inv
 
