@@ -278,7 +278,7 @@ function division_extendida(a::Intervalo,b::Intervalo)
         println(Intervalo(in_a/su_b,Inf)," ∪ ",Intervalo(-Inf,in_a/in_b))
         return (Intervalo(prevfloat(in_a/su_b),Inf), Intervalo(-Inf,nextfloat(in_a/in_b)))
     elseif 0 < in_a && 0==in_b < su_b
-        return Intevalo(prevfloat(in_a/su_b),Inf)
+        return Intervalo(prevfloat(in_a/su_b),Inf)
     elseif 0 ∉ a && b==Intervalo(0,0)
         return intervalo_vacio(typeof(in_a))
     end
