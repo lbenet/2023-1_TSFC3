@@ -1,6 +1,13 @@
-export Intervalo, ..
-export intervalo_vacio, ⪽, hull, ⊔
-export division_extendida
+using ForwardDiff
+
+export Intervalo, Raiz
+export ⪽, hull, ⊔, ..
+export intervalo_vacio, division_extendida, esmonotona, punto_medio, diam,
+       ceros_newton, minimiza, maximiza
+
+const advertencia_intervalo_vacio = Bool[false] 
+
+abstract type AbstractIntervalo <: Real end
 
 @doc raw"""
     Intervalo{T <: AbstractFloat}
@@ -9,11 +16,11 @@ Un intervalo cerrado **[a, b]** donde **a** es llamado el infimo y **b** el supr
 **[a, b]** sea un intervalo, debe cumplirse que **a < b**, con la excepción del intervalo 
 vacío **[Inf, -Inf]**.
 """
-struct Intervalo{T <: AbstractFloat}
+struct Intervalo{T <: AbstractFloat} <: AbstractIntervalo
     infimo::T
     supremo::T
     # Constructor interno 
-    function Intervalo{T}(infimo::T, supremo::T; warn = true) where {T <: AbstractFloat}
+    function Intervalo{T}(infimo::T, supremo::T; warn = advertencia_intervalo_vacio[1]) where {T <: AbstractFloat}
         (infimo ≤ supremo) && return new{T}(infimo, supremo)
         warn && @warn("No se cumple que infimo ($infimo) < supremo ($supremo), regresando el intervalo vacío")
         return new{T}(T(Inf), T(-Inf))
@@ -28,6 +35,11 @@ function Intervalo(infimo::T, supremo::S) where {T, S <: Real}
     return Intervalo(a, b)
 end
 
+function Intervalo{T}(a::S) where {T, S <: Real}
+    U = promote_type(T, S)
+    a_ = convert(U, a)
+    return Intervalo{U}(a_, a_)
+end
 Intervalo(a::T) where {T <: Real} = Intervalo(a, a)
 
 function ..(infimo::T, supremo::S) where {T, S <: Real} 
@@ -56,7 +68,7 @@ import Base: isempty
 Regresa el intervalo vacío **[Inf, -Inf]** del tipo apropiado. 
 """
 function intervalo_vacio(S::Type{T}) where {T <: AbstractFloat}
-    return Intervalo{S}(S(Inf), S(-Inf); warn = false)
+    return Intervalo{S}(S(Inf), S(-Inf))
 end
 
 intervalo_vacio(a::Intervalo{T}) where {T <: AbstractFloat} = intervalo_vacio(T)
@@ -153,13 +165,13 @@ function *(a::Intervalo{T}, b::Intervalo{S}) where {T, S <: AbstractFloat}
     return Intervalo(prevfloat(minimum(x)), nextfloat(maximum(x)))
 end
 
-function *(a::T, b::Intervalo) where {T <: Real}
+function *(a::T, b::S) where {T <: Real, S <: AbstractIntervalo}
     x = a * b.infimo
     y = a * b.supremo
     return Intervalo(prevfloat(min(x, y)), nextfloat(max(x, y)))
 end
 
-*(a::Intervalo, b::T) where {T <: Real} = *(b, a)
+*(a::T, b::S) where {T <: AbstractIntervalo, S <: Real} = *(b, a)
 
 function /(a::Intervalo{T}, b::Intervalo{S}) where {T, S <: AbstractFloat}
     U = promote_type(T, S)
@@ -253,3 +265,18 @@ function show(io::IO, a::Intervalo)
     a2 = inf_string(a.supremo)
     print(io, "[", a1, ", ", a2, "]")
 end
+
+function punto_medio(a::Intervalo)
+    return (a.infimo + a.supremo) / 2
+end
+
+function diam(a::Intervalo)
+    return a.supremo - a.infimo
+end
+
+function esmonotona(f::Function, D::T) where {T <: AbstractIntervalo}
+    return 0 ∉ ForwardDiff.derivative(f, D)
+end
+
+include("raices.jl")
+include("optimizacion.jl")
