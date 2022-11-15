@@ -2,8 +2,8 @@ using ForwardDiff
 
 export Intervalo, Raiz
 export ⪽, hull, ⊔, ..
-export intervalo_vacio, division_extendida, esmonotona, punto_medio, diam,
-       ceros_newton, minimiza, maximiza
+export intervalo_vacio, division_extendida, punto_medio, diam, esmonotona,
+       ceros_newton, bisecta, minimiza, maximiza
 
 const advertencia_intervalo_vacio = Bool[false] 
 
@@ -266,15 +266,30 @@ function show(io::IO, a::Intervalo)
     print(io, "[", a1, ", ", a2, "]")
 end
 
+@doc raw"""
+    punto_medio(a::Intervalo)
+
+Regresa el punto medio del intervalo **a**.
+"""
 function punto_medio(a::Intervalo)
     return (a.infimo + a.supremo) / 2
 end
 
+@doc raw"""
+    diam(a::Intervalo)
+
+Regresa la longitud del intervalo **a**.
+"""
 function diam(a::Intervalo)
     return a.supremo - a.infimo
 end
 
-function esmonotona(f::Function, D::T) where {T <: AbstractIntervalo}
+@doc raw"""
+    esmonotona(f::Function, D::Intervalo)
+
+Verifica si la función **f** es monótona en el intervalo **D** o no. 
+"""
+function esmonotona(f::Function, D::Intervalo)
     return 0 ∉ ForwardDiff.derivative(f, D)
 end
 
