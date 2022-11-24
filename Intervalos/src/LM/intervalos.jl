@@ -265,6 +265,7 @@ function ^(a::Intervalo,b::Int64)
 
     if b==-1
         return 1/a
+    end
     
     a_in=getfield(a,:infimo)^b
     a_su=getfield(a,:supremo)^b
