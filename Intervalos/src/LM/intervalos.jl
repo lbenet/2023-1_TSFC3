@@ -259,7 +259,7 @@ function ^(a::Intervalo,b::Int64)
         return Intervalo(1,1)
     end
     
-    if isnan(getfield(a, :infimo)) || b=1
+    if isnan(getfield(a, :infimo)) || b==1
         return a
     end
 
