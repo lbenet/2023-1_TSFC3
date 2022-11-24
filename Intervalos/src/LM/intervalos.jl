@@ -204,15 +204,18 @@ end
 import Base: /
 
 function /(a::Real,b::Intervalo)
+    in_b=getfield(b, :infimo)
+    su_b=getfield(b, :supremo)
+
     if 0 ∈ b 
-        if b==Intevalo(0.0)
+        if b==Intervalo(0.0)
             return intervalo_vacio(typeof(in_b))
-        elseif in_b < 0 < b_su
+        elseif in_b < 0 < su_b
             return Intervalo(-Inf, Inf)
         elseif 0== in_b < su_b
-            return Intervalo(prevfloat(in_a/su_b),Inf)
+            return Intervalo(prevfloat(a/su_b),Inf)
         elseif in_b < su_b ==0
-            return Intervalo(-Inf,nextfloat(in_a/in_b))
+            return Intervalo(-Inf,nextfloat(a/in_b))
         end
     end
 
