@@ -236,8 +236,16 @@ function /(a::Intervalo,b::Intervalo)
         return b
     end
 
-    if 0 ∈ b
-        return division_extendida(a,b)
+    if 0 ∈ b 
+        if b==Intervalo(0.0)
+            return intervalo_vacio(typeof(in_b))
+        elseif in_b < 0 < su_b
+            return Intervalo(-Inf, Inf)
+        elseif 0== in_b < su_b
+            return Intervalo(prevfloat(min(in_a*1/su_b,su_a*1/su_b)),Inf)
+        elseif in_b < su_b ==0
+            return Intervalo(-Inf,nextfloat(max(in_a*1/in_b,su_a*1/in_b)))
+        end
     end
 
     infimo=min(prevfloat(in_a/in_b),prevfloat(in_a/su_b),prevfloat(su_a/in_b),prevfloat(su_a/su_b))
@@ -316,7 +324,7 @@ function division_extendida(a::Intervalo,b::Intervalo)
     end
 end
 
-/(a::Intervalo,b::Intervalo)=division_extendida(a,b)
+#/(a::Intervalo,b::Intervalo)=division_extendida(a,b)
 
 import Base: inv
 
