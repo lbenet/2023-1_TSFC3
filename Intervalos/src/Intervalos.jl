@@ -12,10 +12,6 @@ module Intervalos
 include("lerm/intervalos.jl")
 #include("Ximena/intervalos.jl")
 #include("Magno/intervalos.jl")
-<<<<<<< HEAD
-include("LM/intervalos.jl")
-=======
 
->>>>>>> Comentarios
 end
  
