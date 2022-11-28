@@ -1,6 +1,10 @@
+using ForwardDiff
+
 #Definimos la estructura Intervalo
 
-struct Intervalo{T<:Real} <:Real
+abstract type AbstractIntervalo <: Real end
+
+struct Intervalo{T<:AbstractFloat} <: AbstractIntervalo
     #Definimos los espacios para el infimo y el supremo.
     infimo::T
     supremo::T
@@ -295,7 +299,7 @@ function ^(a::Intervalo,b::Int64)
         else 
             infimo=prevfloat(min(a_in,a_su))
             supremo=nextfloat(max(a_in,a_su))
-            return (infimo,supremo)
+            return Intervalo(infimo,supremo)
         end
     end
 end
@@ -342,16 +346,19 @@ export division_extendida
 import Base: one
 
 function one(a::Intervalo)
-    return (one(a.infimo),one(a.supremo))
+    return Intervalo(one(a.infimo),one(a.supremo))
 end
 
 import Base: zero
 
 function zero(a::Intervalo)
-    return (zero(a.infimo),zero(a.supremo))
+    return Intervalo(zero(a.infimo),zero(a.supremo))
 end
 
-ForwardDiff.can_dual(::Type{Any}) = true
+function zero(a::Type{Intervalo{Float64}})
+    return Intervalo(zero(Float64))
+end
+
 
 ## Ejercicio 2: Verificando la monotonicidad
 
@@ -366,4 +373,4 @@ end
 
 ## Ejercicio 3: Método de Newton intervalar extendido en 1d
 
-include("raices.jl")
+#include("raices.jl")
