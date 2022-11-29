@@ -1,13 +1,16 @@
 ### Ejercicio 1: Módulo `Intervalos`
-export Intervalo, intervalo_vacio, ⪽, ⊔, division_extendida
-import Base: ==, ∪, ∩, ∈, ∉, ⊆, +, -, *, /, ^, isempty, inv
+export Intervalo, intervalo_vacio, ⪽, ⊔, division_extendida, esmonotona
+import Base: ==, ∪, ∩, ∈, ∉, ⊆, +, -, *, /, ^, isempty, inv, one, zero #one y zero son necesarios para ForwardDiff
+#Hacemos un tipo para intervalo que sea subtipo de Real para poder usar ForwardDiff
+using ForwardDiff
+abstract type TipoIntervalo <: Real end  
 
 """
 Intervalo{T}
 El siguiente código esta basado en lo visto en clase
 
 """
-struct Intervalo{T<:Real}
+struct Intervalo{T<:Real} <: TipoIntervalo
     #damos las posiciones de infimo y supremo
     infimo::T
     supremo::T
@@ -23,7 +26,6 @@ end
 Intervalo(x) = Intervalo(x,x) #para un intervalo delgado
 
 function intervalo_vacio(S::Type)
-# #ya que NaN::S da error cuando S=BigFloat, en este caso definiremos intervalo con big(NaN)
     return Intervalo(S(NaN))
 end
 
@@ -79,14 +81,13 @@ end
 #Para saber si a $\in$ [b] hay que verificar si $$\underline{b}\leq a \leq \overline{b}$$
 
 function ∈(a::Real,b::Intervalo)
-"""
-como el infinito no es real, y los intervalos son reales y cerrados, no permitimos que
-el infinito este en el intervalo
-"""
-    b.infimo == Inf && return false
-    b.supremo == Inf && return false
-    b.infimo ≤ a ≤ b.supremo
-end
+    """
+    como el infinito no es real, y los intervalos son reales y cerrados, no permitimos que
+    el infinito este en el intervalo
+    """
+        a == Inf && return false
+        b.infimo ≤ a ≤ b.supremo
+    end
 
 ### Hull ####################################################
 #Como la unión de dos intervalos puede no definir un intervalo si están muy alejados, usaremos el hull, que es el menor intervalo que incluye los elementos de ambos intervalos, es decir.
@@ -286,7 +287,7 @@ function ^(a::Intervalo, n::Int64)
             #para no perder información y garantizar que los extremos estén dentro
         end
     else #si es impar se conservan los signos
-        a.infimo^n == 0 && return Intervalo(0,nextfloat(sup)) #para no redondear 0's
+        a.infimo^n == 0 && return Intervalo(0,nextfloat(a.supremo^n)) #para no redondear 0's
         a.supremo^n == 0 && return(prevfloat(a.infimo^n),0)
         return Intervalo(prevfloat(a.infimo^n), nextfloat(a.supremo^n))
     end
@@ -324,5 +325,58 @@ function division_extendida(a::Intervalo, b::Intervalo)
         return (intervalo_vacio(BigFloat), )
     end
 end
+
+########################################################################################################
+########################################### Tarea 2 ####################################################
+
+#Ejercicio 1: Intervalo y ForwardDiff
+#Modifica la estructura Intervalo para poder calcular derivadas usando ForwardDiff.derivate(f, dom),con dom un Intervalo.
+
+"""
+Para que funcione con ForwardDiff hay que extender one para que acepte intervalos, como one regresa el neutro 
+multiplicativo con el tipo que se le de, si le damos un intervalo tipo T, esperamos que regrese un intervalo delgado
+de 1 con el tipo que tenga el intervalo dado, asi que, en resumen, one de un intervalo con tipo T es un intervalo
+delgado de one(T), es decir, un intervalo [1,1] con tipo T
+"""
+one(::Intervalo{T}) where T<:Real = Intervalo(one(T)) 
+
+"""
+Análogo al caso anterior, se debe extender 0 para poder usar ForwardDiff sin problema
+
+"""
+zero(::Intervalo{T}) where T<:Real = Intervalo(zero(T))
+"""
+Nótese que la función zero puede recibir tanto variables como en el caso definido anteriormente, como tipos
+Dado que el tipo de Intervalo es justamente Intervalo, este debe agregarse a la definición de zero para evitar errores
+"""
+zero(::Type{Intervalo{T}}) where T<:Real = Intervalo(zero(T))
+
+#Ejercicio 2 Verificando la monotonicidad
+# Escribe la función `esmonotona(f,D)` que verifica si una función $f(x)$ es
+# monótona en el intervalo $D$, explotando de manera adecuada `ForwardDiff`. El resultado de la
+# función debe ser `true` o `false`, es decir, del tipo `Bool`.
+# Noten que el resultado de su implementación puede
+# no coincidir con el matemático que uno espera, lo que resulta de la implementación
+# que hemos hecho del redondeo, que es demasiado exagerado.
+
+"""
+Recordemos que podemos saber si una función es monótona mediante la derivada de la misma, ya que,
+una función f(x) con un dominio dado D es monótona en [x]∈D, si 0 ∉ F'([x]), pero esto cuando no consideramos los
+extremos pues podríamos obtener algo del tipo [0,1] y esto cumple aun la monotonicidad, por lo que, para revisar
+si hay un cero allí, revisamos si los signos del infimo y el supremo del intervalo de F' cambian, es decir, si 
+inf*sup < 0, esto cumple que hay un cero dentro y no es monotona, si se da la igualdad o que inf*sup > 0, es monótona
+"""
+
+
+function esmonotona(f::Function, D::T) where {T <: TipoIntervalo}
+    fprim = ForwardDiff.derivative(f, D)
+    fprim.infimo*fprim.supremo < 0.0 && return false #inf y supremo tiene diferentes signos, hay un cero
+    fprim.infimo*fprim.supremo > 0.0 && return true #mismo signo, no hay cero, es monotona
+    fprim.infimo*fprim.supremo == 0.0 && return true #si hay cero en algun extremo se cumple igualdad, es monotona
+end
+
+include("raices.jl")
+# include("optimizacion.jl")
+
 
 
