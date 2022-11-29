@@ -376,7 +376,7 @@ function esmonotona(f::Function, D::T) where {T <: TipoIntervalo}
 end
 
 include("raices.jl")
-# include("optimizacion.jl")
+include("optimizacion.jl")
 
 
 
