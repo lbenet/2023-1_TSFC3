@@ -366,11 +366,11 @@ export esmonotona
 
 function esmonotona(a::Function , b::Intervalo)
     fprima = ForwardDiff.derivative(a,b)
-    @show(fprima)
+    #@show(fprima)
     0 ∈ fprima && return false
     return true
 end
 
 ## Ejercicio 3: Método de Newton intervalar extendido en 1d
 
-#include("raices.jl")
+include("raices.jl")
