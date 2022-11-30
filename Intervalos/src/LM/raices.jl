@@ -1,4 +1,4 @@
-export ceros_newton
+export ceros_newton, Raiz
 #Definimos la estructura Raiz
 
 struct Raiz{T<:AbstractFloat}
