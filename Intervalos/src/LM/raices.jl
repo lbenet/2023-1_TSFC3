@@ -35,14 +35,14 @@ function ceros_newton(f::Function, dom::Intervalo, tol::AbstractFloat=1/1024)
     bz= !(0 ∈ f(dom)) 
     while !bz
         for _ in eachindex(candidatos)
-            dominio = popfirst!(candidatos) # Extraemos y borramos la primer entrada de `Nm`
+            dominio = popfirst!(candidatos) # Extraemos y borramos la primer entrada de `candidatos`
             #print(dominio)
             dominio= dominio  ∩ dom_intersec
             isnan(dominio.infimo) && continue
             vf = f(dominio)
             0 ∉ vf && continue
             if diam(dominio) < tol
-                push!(candidatos, dominio)   # Se incluye a `dom` (al final de `Nm`)
+                push!(candidatos, dominio)   # Se incluye a `dominio` (al final de `candidatos`)
             else
                 nuevos=N_extdiv(f,dominio) .∩ dominio
                 append!(candidatos, nuevos) 

@@ -374,3 +374,4 @@ end
 ## Ejercicio 3: Método de Newton intervalar extendido en 1d
 
 include("raices.jl")
+include("optimizacion.jl")
