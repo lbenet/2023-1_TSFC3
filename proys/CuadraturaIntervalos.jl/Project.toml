@@ -1,0 +1,12 @@
+name = "CuadraturaIntervalos"
+uuid = "ce4ac369-035e-4496-81b7-2fac70d0c836"
+authors = ["Luis Eduardo Ramírez Montoya <luiseduardoramirezmontoya@ciencias.unam.mx>"]
+version = "0.1.0"
+
+[deps]
+ForwardDiff = "f6369f11-7733-5829-9624-2563aa707210"
+IntervalArithmetic = "d1acc4aa-44c8-5952-acd4-ba5d80a2a253"
+RoundingEmulator = "5eaf0fd0-dfba-4ccb-bf02-d820a40db705"
+SpecialFunctions = "276daf66-3868-5448-9aa4-cd146d93841b"
+TaylorSeries = "6aa5eb33-94cf-58f4-a9d0-e4b2c4fc25ea"
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
