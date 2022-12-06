@@ -10,8 +10,8 @@ module Intervalos
 # sus archivos, la(s) siguientes líneas:
 # include("zYo/intervalos.jl")
 #include("lerm/intervalos.jl")
-#include("Ximena/intervalos.jl")
+include("Ximena/intervalos.jl")
 #include("Magno/intervalos.jl")
-include("LM/intervalos.jl")
+#include("LM/intervalos.jl")
 end
  
