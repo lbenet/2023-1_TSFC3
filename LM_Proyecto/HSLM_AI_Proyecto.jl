@@ -1,12 +1,12 @@
 # Proyecto: Implementación del concepto de ''caja''.
 
-#Descripción: En este proyecto se busca implementar el concepto de "caja", 
-#el cual se refiere al producto carteriano de n intervalos.
-#Además, se pretende extender el concepto a n-dimensiones
+# Descripción: En este proyecto se busca implementar el concepto de "caja", 
+# el cual se refiere al producto carteriano de n intervalos.
+# Además, se pretende extender el concepto a n-dimensiones
 
-#Por otro lado, se pretende que esta estructura sea lo suficientmente
-#adecuada para poderla utilizar en alguna aplcación, por ejemplo, en 
-#la busqueda de ceros de sistemas de ecuaciones.
+# Por otro lado, se pretende que esta estructura sea lo suficientmente
+# adecuada para poderla utilizar en alguna aplcación, por ejemplo, en 
+# la busqueda de ceros de sistemas de ecuaciones.
 
 ###########################################################
 
@@ -36,10 +36,10 @@
 
 #         X_i \cap Y_i=(X_1 \cap Y_1,X_2 \cap Y_2,\cdots,X_n \cap Y_n)
 
-# 3. Si X=(X1,...Xn) y Y=(Y1,...Yn) son vectores de interavalos entonces se dice que X 
+# 3. Si X=(X1,...Xn) y Y=(Y1,...Yn) son vectores de intervalos entonces se dice que X 
 # está contenido en Y si Xi está contenido en Yi, i=1,..,n.
 
-#         X \supset Y si  X_i \supset Y_i para i=1,\cdots,N
+#         X \subset Y si  X_i \subset Y_i para i=1,\cdots,N
 
 # 4. El ancho de un vector de intervalos X=(X1,...Xn) se define como el ancho
 # más grande de sus componentes.
@@ -57,3 +57,6 @@
 #         ||X||=max(max(abs(X_i))), i=1,...,n
 
 ##  Funciones a implementar
+
+# Por cada una de las propiedades habrá que implementar una función.
+
