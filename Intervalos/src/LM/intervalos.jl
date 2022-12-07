@@ -1,6 +1,10 @@
+using ForwardDiff
+
 #Definimos la estructura Intervalo
 
-struct Intervalo{T<:Real} 
+abstract type AbstractIntervalo <: Real end
+
+struct Intervalo{T<:AbstractFloat} <: AbstractIntervalo
     #Definimos los espacios para el infimo y el supremo.
     infimo::T
     supremo::T
@@ -13,7 +17,7 @@ struct Intervalo{T<:Real}
     end
 end
 #Creamos una función para los intervalos delgados
-Intervalo(x) = Intervalo(x,x)
+Intervalo(x::T) where {T<:Real} = Intervalo(x,x)
 
 
 export Intervalo
@@ -112,34 +116,33 @@ end
 
 import Base: +
 
-function +(a,b::Intervalo)
-    if typeof(a)<:Real
-        infimo=prevfloat(a+getfield(b, :infimo))
-        supremo=nextfloat(a+getfield(b, :supremo))
-        return Intervalo(infimo,supremo)
-    else
-        infimo=prevfloat(getfield(a, :infimo)+getfield(b, :infimo))
-        supremo=nextfloat(getfield(a, :supremo)+getfield(b, :supremo))
-        return Intervalo(infimo,supremo)
-    end
+function +(a::Real,b::Intervalo)
+    infimo=prevfloat(a+getfield(b, :infimo))
+    supremo=nextfloat(a+getfield(b, :supremo))
+    return Intervalo(infimo,supremo)
+end
+function +(a::Intervalo,b::Intervalo)
+    infimo=prevfloat(getfield(a, :infimo)+getfield(b, :infimo))
+    supremo=nextfloat(getfield(a, :supremo)+getfield(b, :supremo))
+    return Intervalo(infimo,supremo)
 end
 
-+(a::Intervalo,b)=+(b,a)
++(a::Intervalo,b::Real)=+(b,a)
 
-+(a::Intervalo,b::Intervalo)=Intervalo(prevfloat(getfield(a, :infimo)+getfield(b, :infimo)),nextfloat(getfield(a, :supremo)+getfield(b, :supremo)))
+#+(a::Intervalo,b::Intervalo)=Intervalo(prevfloat(getfield(a, :infimo)+getfield(b, :infimo)),nextfloat(getfield(a, :supremo)+getfield(b, :supremo)))
 
 import Base: -
 
-function -(a,b::Intervalo)
-    if typeof(a)<:Real
-        infimo=prevfloat(a-getfield(b, :supremo))
-        supremo=nextfloat(a-getfield(b, :infimo))
-        return Intervalo(infimo,supremo)
-    else
-        infimo=prevfloat(getfield(a, :infimo)-getfield(b, :supremo))
-        supremo=nextfloat(getfield(a, :supremo)-getfield(b, :infimo))
-        return Intervalo(infimo,supremo)
-    end
+function -(a::Real,b::Intervalo)
+    infimo=prevfloat(a-getfield(b, :supremo))
+    supremo=nextfloat(a-getfield(b, :infimo))
+    return Intervalo(infimo,supremo)
+end
+
+function -(a::Intervalo,b::Intervalo)
+    infimo=prevfloat(getfield(a, :infimo)-getfield(b, :supremo))
+    supremo=nextfloat(getfield(a, :supremo)-getfield(b, :infimo))
+    return Intervalo(infimo,supremo)
 end
 
 -(a::Intervalo)=Intervalo(-getfield(a, :supremo),-getfield(a, :infimo))
@@ -148,7 +151,30 @@ end
 
 import Base: *
 
-function *(a,b::Intervalo)
+function *(a::Real, b::Intervalo)
+    
+    in_b=getfield(b, :infimo)
+    su_b=getfield(b, :supremo)
+    
+    if b==intervalo_vacio(Real)
+        return b
+    end
+    
+    if abs(a)==Inf &&  in_b==0 && su_b==0
+            return Intervalo(0.0)
+        elseif su_b*a==Inf &&  in_b==0 || in_b*a==Inf &&  su_b==0 
+            return Intervalo(0,Inf)
+        elseif su_b*a==-Inf &&  in_b==0 || in_b*a==-Inf &&  su_b==0 
+            return Intervalo(-Inf,0)
+        end      
+    infimo=min(prevfloat(a*in_b),prevfloat(a*su_b))
+    supremo=max(nextfloat(a*in_b),nextfloat(a*su_b))
+    return Intervalo(infimo,supremo)
+end
+
+function *(a::Intervalo,b::Intervalo)
+    in_a=getfield(a, :infimo)
+    su_a=getfield(a, :supremo)
     in_b=getfield(b, :infimo)
     su_b=getfield(b, :supremo)
     
@@ -159,44 +185,27 @@ function *(a,b::Intervalo)
     if b==intervalo_vacio(Real)
         return b
     end
-    
-    
-    if typeof(a)<:Real
-        if abs(a)==Inf &&  in_b==0 && su_b==0
-            return Intervalo(0.0)
-        elseif su_b*a==Inf &&  in_b==0 || in_b*a==Inf &&  su_b==0 
-            return Intervalo(0,Inf)
-        elseif su_b*a==-Inf &&  in_b==0 || in_b*a==-Inf &&  su_b==0 
-            return Intervalo(-Inf,0)
-        end      
-        infimo=min(prevfloat(a*in_b),prevfloat(a*su_b))
-        supremo=max(nextfloat(a*in_b),nextfloat(a*su_b))
-        return Intervalo(infimo,supremo)
-    else
-        in_a=getfield(a, :infimo)
-        su_a=getfield(a, :supremo)
-        
-        if isnan(prevfloat(in_a*in_b)) && isnan(prevfloat(su_a*su_b))
-            infimo=0.0
-            supremo=0.0
-        elseif isnan(prevfloat(in_a*in_b))
-            infimo=min(0,prevfloat(in_a*su_b),prevfloat(su_a*in_b),prevfloat(su_a*su_b))
-            supremo=max(0,nextfloat(in_a*su_b),nextfloat(su_a*in_b),nextfloat(su_a*su_b))
-        elseif isnan(prevfloat(in_a*su_b))
-            infimo=min(prevfloat(in_a*in_b),0,prevfloat(su_a*in_b),prevfloat(su_a*su_b))
-            supremo=max(nextfloat(in_a*in_b),0,nextfloat(su_a*in_b),nextfloat(su_a*su_b))
-        elseif isnan(prevfloat(su_a*in_b))
-            infimo=min(prevfloat(in_a*in_b),prevfloat(in_a*su_b),0,prevfloat(su_a*su_b))
-            supremo=max(nextfloat(in_a*in_b),nextfloat(in_a*su_b),0,nextfloat(su_a*su_b))
-        elseif isnan(prevfloat(su_a*su_b))
-            infimo=min(prevfloat(in_a*in_b),prevfloat(in_a*su_b),prevfloat(su_a*in_b),0)
-            supremo=max(nextfloat(in_a*in_b),nextfloat(in_a*su_b),nextfloat(su_a*in_b),0)
-        else 
-            infimo=min(prevfloat(in_a*in_b),prevfloat(in_a*su_b),prevfloat(su_a*in_b),prevfloat(su_a*su_b))
-            supremo=max(nextfloat(in_a*in_b),nextfloat(in_a*su_b),nextfloat(su_a*in_b),nextfloat(su_a*su_b))
-        end
-        return Intervalo(infimo,supremo)
+
+    if isnan(prevfloat(in_a*in_b)) && isnan(prevfloat(su_a*su_b))
+        infimo=0.0
+        supremo=0.0
+    elseif isnan(prevfloat(in_a*in_b))
+        infimo=min(0,prevfloat(in_a*su_b),prevfloat(su_a*in_b),prevfloat(su_a*su_b))
+        supremo=max(0,nextfloat(in_a*su_b),nextfloat(su_a*in_b),nextfloat(su_a*su_b))
+    elseif isnan(prevfloat(in_a*su_b))
+        infimo=min(prevfloat(in_a*in_b),0,prevfloat(su_a*in_b),prevfloat(su_a*su_b))
+        supremo=max(nextfloat(in_a*in_b),0,nextfloat(su_a*in_b),nextfloat(su_a*su_b))
+    elseif isnan(prevfloat(su_a*in_b))
+        infimo=min(prevfloat(in_a*in_b),prevfloat(in_a*su_b),0,prevfloat(su_a*su_b))
+        supremo=max(nextfloat(in_a*in_b),nextfloat(in_a*su_b),0,nextfloat(su_a*su_b))
+    elseif isnan(prevfloat(su_a*su_b))
+        infimo=min(prevfloat(in_a*in_b),prevfloat(in_a*su_b),prevfloat(su_a*in_b),0)
+        supremo=max(nextfloat(in_a*in_b),nextfloat(in_a*su_b),nextfloat(su_a*in_b),0)
+    else 
+        infimo=min(prevfloat(in_a*in_b),prevfloat(in_a*su_b),prevfloat(su_a*in_b),prevfloat(su_a*su_b))
+        supremo=max(nextfloat(in_a*in_b),nextfloat(in_a*su_b),nextfloat(su_a*in_b),nextfloat(su_a*su_b))
     end
+    return Intervalo(infimo,supremo)
 end
 
 *(a::Intervalo,b::Real)=*(b,a)
@@ -290,7 +299,7 @@ function ^(a::Intervalo,b::Int64)
         else 
             infimo=prevfloat(min(a_in,a_su))
             supremo=nextfloat(max(a_in,a_su))
-            return (infimo,supremo)
+            return Intervalo(infimo,supremo)
         end
     end
 end
@@ -331,3 +340,38 @@ import Base: inv
 inv(a::Intervalo)=1/a
 
 export division_extendida
+
+# Para la tarea 2: Ejercicio 1: Intervalo y ForwardDiff¶
+
+import Base: one
+
+function one(a::Intervalo)
+    return Intervalo(one(a.infimo),one(a.supremo))
+end
+
+import Base: zero
+
+function zero(a::Intervalo)
+    return Intervalo(zero(a.infimo),zero(a.supremo))
+end
+
+function zero(a::Type{Intervalo{Float64}})
+    return Intervalo(zero(Float64))
+end
+
+
+## Ejercicio 2: Verificando la monotonicidad
+
+export esmonotona
+
+function esmonotona(a::Function , b::Intervalo)
+    fprima = ForwardDiff.derivative(a,b)
+    #@show(fprima)
+    0 ∈ fprima && return false
+    return true
+end
+
+## Ejercicio 3: Método de Newton intervalar extendido en 1d
+
+include("raices.jl")
+include("optimizacion.jl")
