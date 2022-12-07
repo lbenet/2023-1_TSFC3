@@ -1,10 +1,16 @@
 import Base: ==, isempty,⊆, ∪, ∩, ∈, ∉, +, -, *, ^, iszero, /, inv #se importan las funciones modificadas
 
-export Intervalo, intervalo_vacio, ⪽, ⊔, division_extendida #se exportan las funciones creadas
+export Intervalo, intervalo_vacio, ⪽, ⊔, division_extendida, esmonotona #se exportan las funciones creadas
+
+export minimiza, maximiza #se exportan las funciones creadas de optimizacion.jl
+
+export Raiz, diam, mid, ceros_newton #se exportan las funciones creadas en raices.jl
+
+using ForwardDiff 
 
 # Se define la estructura Intervalo que recibe dos parametros llamados supremos e infimo
 
-struct Intervalo{T<:Real}
+struct Intervalo{T<:Real} <: Real
     infimo::T
     supremo::T
     
@@ -12,7 +18,21 @@ struct Intervalo{T<:Real}
         infimo1, supremo1, _ = promote(infimo, supremo, 1.0) 
         infimo1 > supremo1  ? error("Supremo es menor que el ínfimo") : new{typeof(infimo1)}(infimo1,supremo1)
     end
+
+
+    #se agrega esta funcion para igualar el tipo del intervalo y el argumento
+
+    function Intervalo{T}(infimo) where T <: Real 
+        infimo1, _ = promote(infimo, T(1)) 
+        new{typeof(infimo1)}(infimo1, infimo)
+    end    
 end
+
+
+# se llama a los otros archivos creados
+
+include("raices.jl")
+include("optimizacion.jl")
 
 #puede recibir un solo elemento cuando se quiere definir un intervalo delgado
 Intervalo(infimo) = Intervalo(infimo,infimo) 
@@ -180,3 +200,14 @@ function division_extendida(a::Intervalo, b::Intervalo)
     0 < a.infimo && 0 == b.infimo < b.supremo && return (Intervalo(prevfloat(a.infimo/b.supremo), Inf),)
     0∉a && iszero(b) && return (Intervalo(NaN),)
 end
+
+
+"""funcion que verifica si una funcion es monotona en un intervalo dado, esto es cierto
+cuando la derivada no cambia de signo"""
+
+function esmonotona(f, D::Intervalo)
+    a = ForwardDiff.derivative(f, D)
+    sign(a.infimo) == sign(a.supremo) && return true
+    return false
+end
+
